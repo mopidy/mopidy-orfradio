@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
-
 import logging
-import urllib2
+import urllib
 
 from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
@@ -25,11 +22,11 @@ class HttpClient(object):
     def get(self, url):
         try:
             logger.info('Fetching data from \'%s\'.', url)
-            response = urllib2.urlopen(url)
+            response = urllib.request.urlopen(url)
             content = response.read()
             encoding = response.headers['content-type'].split('charset')[-1]
-            return unicode(content, encoding)
-        except Exception, e:
+            return content.decode(encoding)
+        except Exception as e:
             logger.error('Error fetching data from \'%s\': %s', url, e)
 
     def refresh(self):
@@ -109,7 +106,7 @@ class OE1Client(object):
             content = self.http_client.get(uri)
             decoder = simplejson.JSONDecoder()
             return decoder.decode(content)
-        except Exception, e:
+        except Exception as e:
             logger.error('Error decoding content received from \'%s\': %s',
                          uri, e)
 

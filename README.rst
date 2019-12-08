@@ -35,6 +35,10 @@ Project resources
 Changelog
 =========
 
+v2.0.0 (2019-12-08)
+-------------------
+- Ported to Python 3 (Tobias Girstmair `girst <https://gir.st/>`_)
+
 v1.2.0 (2017-06-11)
 -------------------
 - Update live stream URLs

@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import logging
 import re
 
-from client import OE1Client
-
 from mopidy import backend
 from mopidy.models import Ref, Track
+
+from .client import OE1Client
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class OE1LibraryProvider(backend.LibraryProvider):
     def browse(self, uri):
         try:
             library_uri = OE1LibraryUri.parse(uri)
-        except InvalidOE1Uri, e:
+        except InvalidOE1Uri as e:
             logger.error(e)
             return []
 
@@ -45,8 +45,8 @@ class OE1LibraryProvider(backend.LibraryProvider):
         if library_uri.uri_type == OE1UriType.ARCHIVE_DAY:
             return self._browse_day(library_uri.day_id)
 
-        logger.warn('OE1LibraryProvider.browse called with uri '
-                    'that does not support browsing: \'%s\'.' % uri)
+        logger.warning('OE1LibraryProvider.browse called with uri '
+                       'that does not support browsing: \'%s\'.' % uri)
         return []
 
     def _browse_archive(self):
@@ -67,7 +67,7 @@ class OE1LibraryProvider(backend.LibraryProvider):
     def lookup(self, uri):
         try:
             library_uri = OE1LibraryUri.parse(uri)
-        except InvalidOE1Uri, e:
+        except InvalidOE1Uri as e:
             logger.error(e)
             return []
 
@@ -83,8 +83,8 @@ class OE1LibraryProvider(backend.LibraryProvider):
         if library_uri.uri_type == OE1UriType.ARCHIVE_ITEM:
             return self._lookup_item(library_uri.day_id, library_uri.item_id)
 
-        logger.warn('OE1LibraryProvider.lookup called with uri '
-                    'that does not support lookup: \'%s\'.' % uri)
+        logger.warning('OE1LibraryProvider.lookup called with uri '
+                       'that does not support lookup: \'%s\'.' % uri)
         return []
 
     def _lookup_item(self, day_id, item_id):
@@ -103,8 +103,8 @@ class OE1LibraryUri(object):
         self.day_id = day_id
         self.item_id = item_id
 
-    archive_parse_expression = '^' + re.escape(OE1Uris.ARCHIVE) +\
-                               ':(?P<day_id>\d{8})(:(?P<item_id>\d+))?$'
+    archive_parse_expression = r'^' + re.escape(OE1Uris.ARCHIVE) +\
+                               r':(?P<day_id>\d{8})(:(?P<item_id>\d+))?$'
     archive_parser = re.compile(archive_parse_expression)
 
     @staticmethod

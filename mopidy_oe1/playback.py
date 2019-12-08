@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 import logging
 
-from client import OE1Client
-
 from mopidy import backend
 
 from mopidy_oe1.library import InvalidOE1Uri, OE1LibraryUri, OE1UriType
+
+from .client import OE1Client
 
 logger = logging.getLogger(__name__)
 
