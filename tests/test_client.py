@@ -2,18 +2,18 @@ from __future__ import unicode_literals
 
 import unittest
 
-from mopidy_oe1.client import OE1Client
+from mopidy_orfradio.client import ORFClient
 
 from . import utils
 
 
-class OE1ClientTest(unittest.TestCase):
+class ORFClientTest(unittest.TestCase):
     def setUp(self):
         self.http_client_mock = utils.HttpClientMock()
-        self.oe1_client = OE1Client(self.http_client_mock)
+        self.orf_client = ORFClient(self.http_client_mock)
 
     def test_get_days(self):
-        days = self.oe1_client.get_days()
+        days = self.orf_client.get_days()
 
         self.assertListEqual(days, [
             {'id': '20170605', 'label': 'Mon 05. Jun 2017'},
@@ -21,7 +21,7 @@ class OE1ClientTest(unittest.TestCase):
         ])
 
     def test_get_day(self):
-        day = self.oe1_client.get_day('20170604')
+        day = self.orf_client.get_day('20170604')
 
         self.assertEqual(day, {
             'id': '20170604',
@@ -34,7 +34,7 @@ class OE1ClientTest(unittest.TestCase):
         })
 
     def test_get_item(self):
-        day = self.oe1_client.get_item('20170604', '0')
+        day = self.orf_client.get_item('20170604', '0')
 
         self.assertEqual(day, {
             'id': '0',

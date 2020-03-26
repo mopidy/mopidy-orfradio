@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 class Extension(ext.Extension):
 
-    dist_name = 'Mopidy-OE1'
-    ext_name = 'oe1'
+    dist_name = 'Mopidy-ORFRadio'
+    ext_name = 'orfradio'
     version = __version__
 
     def get_default_config(self):
@@ -26,5 +26,5 @@ class Extension(ext.Extension):
         return schema
 
     def setup(self, registry):
-        from .backend import OE1Backend
-        registry.add('backend', OE1Backend)
+        from .backend import ORFBackend
+        registry.add('backend', ORFBackend)

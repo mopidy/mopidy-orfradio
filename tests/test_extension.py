@@ -2,7 +2,7 @@
 #
 # import unittest
 #
-# from mopidy_oe1 import Extension
+# from mopidy_orfradio import Extension
 #
 #
 # class ExtensionTest(unittest.TestCase):
@@ -12,7 +12,7 @@
 #
 #         config = ext.get_default_config()
 #
-#         self.assertIn('[oe1]', config)
+#         self.assertIn('[orfradio]', config)
 #         self.assertIn('enabled = true', config)
 #
 #     def test_get_config_schema(self):

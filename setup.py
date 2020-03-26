@@ -12,13 +12,13 @@ def get_version(filename):
 
 
 setup(
-    name='Mopidy-OE1',
-    version=get_version('mopidy_oe1/__init__.py'),
-    url='https://github.com/tischlda/mopidy-oe1',
+    name='Mopidy-ORFRadio',
+    version=get_version('mopidy_orfradio/__init__.py'),
+    url='https://github.com/girst/mopidy-orfradio',
     license='Apache License, Version 2.0',
-    author='David Tischler',
-    author_email='david@tischler.io',
-    description='Mopidy backend to access the Austrian radio station OE1.',
+    author='Tobias Girstmair, David Tischler',
+    author_email='https://gir.st/',
+    description='Mopidy backend to access the Austrian ORF radio stations.',
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
     zip_safe=False,
@@ -28,7 +28,7 @@ setup(
         'simplejson',
         'python-dateutil',
         'beaker',
-        'Mopidy >= 1.0',
+        'Mopidy >= 3.0',
         'Pykka >= 1.1',
     ],
     test_suite='nose.collector',
@@ -38,7 +38,7 @@ setup(
     ],
     entry_points={
         'mopidy.ext': [
-            'oe1 = mopidy_oe1:Extension',
+            'orfradio = mopidy_orfradio:Extension',
         ],
     },
     classifiers=[

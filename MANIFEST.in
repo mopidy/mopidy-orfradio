@@ -3,6 +3,6 @@ include .travis.yml
 include LICENSE
 include MANIFEST.in
 include README.rst
-include mopidy_oe1/ext.conf
+include mopidy_orfradio/ext.conf
 
 recursive-include tests *.py

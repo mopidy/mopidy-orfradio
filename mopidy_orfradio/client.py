@@ -33,7 +33,7 @@ class HttpClient(object):
         self.cache.invalidate(self.get, 'get')
 
 
-class OE1Client(object):
+class ORFClient(object):
     archive_uri = 'http://audioapi.orf.at/oe1/json/2.0/broadcasts/'
     record_uri = 'https://audioapi.orf.at/oe1/api/json/current/broadcast/%s/%s'
     item_uri = 'http://loopstream01.apa.at/?channel=oe1&shoutcast=0&id=%s'
@@ -96,7 +96,7 @@ class OE1Client(object):
             return ""
 
         streamId = streams[0]['loopStreamId']
-        return OE1Client.item_uri % streamId
+        return ORFClient.item_uri % streamId
 
     def refresh(self):
         self.http_client.refresh()
@@ -111,14 +111,14 @@ class OE1Client(object):
                          uri, e)
 
     def _get_archive_json(self):
-        return self._get_json(OE1Client.archive_uri)
+        return self._get_json(ORFClient.archive_uri)
 
     def _get_day_json(self, day_id):
         json = self._get_archive_json()
         return next(rec for rec in json if _get_day_id(rec) == day_id)
 
     def _get_record_json(self, programKey, day):
-        return self._get_json(OE1Client.record_uri % (programKey, day))
+        return self._get_json(ORFClient.record_uri % (programKey, day))
 
 
 def _get_day_id(day_rec):
