@@ -36,7 +36,7 @@ class HttpClient(object):
 class ORFClient(object):
     archive_uri = 'http://audioapi.orf.at/%s/json/2.0/broadcasts/'
     record_uri = 'https://audioapi.orf.at/%s/api/json/current/broadcast/%s/%s'
-    item_uri = 'http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s'
+    show_uri = 'http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s'
     live_uri = "https://%sshoutcast.sf.apa.at/;"
 
     def __init__(self, http_client=HttpClient()):
@@ -57,7 +57,7 @@ class ORFClient(object):
 
     def get_day(self, station, day_id):
 
-        def to_item(i, rec):
+        def to_show(i, rec):
             time = dateutil.parser.parse(rec['startISO'])
 
             return {
@@ -67,14 +67,14 @@ class ORFClient(object):
             }
 
         day_rec = self._get_day_json(station, day_id)
-        items = [to_item(i, broadcast_rec)
+        shows = [to_show(i, broadcast_rec)
                  for i, broadcast_rec in enumerate(day_rec['broadcasts'])
                  if broadcast_rec['isBroadcasted']]
 
         return {
                 'id': day_id,
                 'label': _get_day_label(day_rec),
-                'items': items
+                'shows': shows
         }
 
     def get_live_url(self, station):
@@ -95,24 +95,24 @@ class ORFClient(object):
         }.get(station)
         return ORFClient.live_uri % shoutcast_slug
 
-    def get_item(self, station, day_id, item_id):
+    def get_show(self, station, day_id, show_id):
         day = self.get_day(station, day_id)
-        return next(item for item in day['items'] if item['id'] == item_id)
+        return next(show for show in day['shows'] if show['id'] == show_id)
 
-    def get_item_url(self, station, day_id, item_id):
+    def get_show_url(self, station, day_id, show_id):
         day_rec = self._get_day_json(station, day_id)
 
-        item_id = int(item_id)
-        item_rec = day_rec['broadcasts'][item_id]
+        show_id = int(show_id)
+        show_rec = day_rec['broadcasts'][show_id]
 
-        json = self._get_record_json(station, item_rec['programKey'], day_id)
+        json = self._get_record_json(station, show_rec['programKey'], day_id)
 
         streams = json['streams']
         if len(streams) == 0:
             return ""
 
-        streamId = streams[0]['loopStreamId']
-        return ORFClient.item_uri % (station, streamId)
+        streamId = streams[0]['loopStreamId'] # XXX: must return all urls!
+        return ORFClient.show_uri % (station, streamId)
 
     def refresh(self):
         self.http_client.refresh()

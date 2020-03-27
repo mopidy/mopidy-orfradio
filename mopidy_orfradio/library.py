@@ -87,10 +87,10 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return '%s: %s' % (item['time'], item['title'])
 
     def _browse_day(self, station, day_id):
-        return [Ref.track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM,
-                                                station, day_id, item['id'])),
-                          name=self._get_track_title(item))
-                for item in self.client.get_day(station, day_id)['items']]
+        return [Ref.track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW,
+                                                station, day_id, show['id'])),
+                          name=self._get_track_title(show))
+                for show in self.client.get_day(station, day_id)['shows']]
 
     def lookup(self, uri):
         try:
@@ -108,34 +108,35 @@ class ORFLibraryProvider(backend.LibraryProvider):
         if library_uri.uri_type == ORFUriType.ARCHIVE_DAY:
             return self._browse_day(library_uri.station, library_uri.day_id)
 
-        if library_uri.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return self._lookup_item(library_uri.station, library_uri.day_id, library_uri.item_id)
+        if library_uri.uri_type == ORFUriType.ARCHIVE_SHOW:
+            return self._lookup_show(library_uri.station, library_uri.day_id, library_uri.show_id)
 
         logger.warning('ORFLibraryProvider.lookup called with uri '
                        'that does not support lookup: \'%s\'.' % uri)
         return []
 
-    def _lookup_item(self, station, day_id, item_id):
-        item = self.client.get_item(station, day_id, item_id)
-        return [Track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station,
-                                            day_id, item['id'])),
-                      name=self._get_track_title(item))]
+    def _lookup_show(self, station, day_id, show_id):
+        show = self.client.get_show(station, day_id, show_id)
+        return [Track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station,
+                                            day_id, show['id'])),
+                      name=self._get_track_title(show))]
 
     def refresh(self, uri=None):
         self.client.refresh()
 
 
 class ORFLibraryUri(object):
-    def __init__(self, uri_type, station_slug=None, day_id=None, item_id=None):
+    def __init__(self, uri_type, station_slug=None, day_id=None, show_id=None, item_id=None):
         self.uri_type = uri_type
         self.station = station_slug
         self.day_id = day_id
+        self.show_id = show_id
         self.item_id = item_id
 
     @staticmethod
     def parse(uri):
         scheme, _, path, _, _ = urllib.parse.urlsplit(uri)
-        station, browse, day, item, *_ = path.split('/', 4) + [None]*4
+        station, browse, day, show, *_ = path.split('/', 4) + [None]*4
 
         if station == '':
             return ORFLibraryUri(ORFUriType.ROOT)
@@ -146,8 +147,8 @@ class ORFLibraryUri(object):
         if browse == 'live':
             return ORFLibraryUri(ORFUriType.LIVE, station)
         if browse == 'archive':
-            if item:
-                return ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station, day, item)
+            if show:
+                return ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, day, show)
             if day:
                 return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, day)
             return ORFLibraryUri(ORFUriType.ARCHIVE, station)
@@ -165,8 +166,8 @@ class ORFLibraryUri(object):
             return f'{ORFUris.ROOT}:{self.station}/archive'
         if self.uri_type == ORFUriType.ARCHIVE_DAY:
             return f'{ORFUris.ROOT}:{self.station}/archive/{self.day_id}'
-        if self.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return f'{ORFUris.ROOT}:{self.station}/archive/{self.day_id}/{self.item_id}'
+        if self.uri_type == ORFUriType.ARCHIVE_SHOW:
+            return f'{ORFUris.ROOT}:{self.station}/archive/{self.day_id}/{self.show_id}'
 
 
 class InvalidORFUri(TypeError):
@@ -181,4 +182,5 @@ class ORFUriType(object):
     LIVE = 2
     ARCHIVE = 3
     ARCHIVE_DAY = 4
-    ARCHIVE_ITEM = 5
+    ARCHIVE_SHOW = 5
+    ARCHIVE_ITEM = 6

@@ -40,12 +40,12 @@ class ORFLibraryUriTest(unittest.TestCase):
         uri = 'foo:bar'
         self.assertRaises(TypeError, ORFLibraryUri.parse, uri)
 
-    def test_parse_item_uri(self):
+    def test_parse_show_uri(self):
         uri = 'orfradio:oe1/archive/20140914/382176'
         result = ORFLibraryUri.parse(uri)
-        self.assertEqual(result.uri_type, ORFUriType.ARCHIVE_ITEM)
+        self.assertEqual(result.uri_type, ORFUriType.ARCHIVE_SHOW)
         self.assertEqual(result.day_id, '20140914')
-        self.assertEqual(result.item_id, '382176')
+        self.assertEqual(result.show_id, '382176')
 
     def test_create_root_uri(self):
         parsed_uri = ORFLibraryUri(ORFUriType.ROOT)
@@ -67,8 +67,8 @@ class ORFLibraryUriTest(unittest.TestCase):
         parsed_uri = ORFLibraryUri(ORFUriType.ARCHIVE_DAY, 'oe1', '20140914')
         self.assertEqual(str(parsed_uri), 'orfradio:oe1/archive/20140914')
 
-    def test_create_item_uri(self):
-        parsed_uri = ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, 'oe1',
+    def test_create_show_uri(self):
+        parsed_uri = ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, 'oe1',
                                    '20140914', '382176')
         self.assertEqual(str(parsed_uri), 'orfradio:oe1/archive/20140914/382176')
 
@@ -84,14 +84,14 @@ class ORFLibraryProviderTest(unittest.TestCase):
         )
         self.client_mock.get_day = Mock(
             return_value={
-                'items': [
+                'shows': [
                     {'id': '1', 'time': '01:00', 'title': 'Item1'},
                     {'id': '2', 'time': '02:00', 'title': 'Item2'},
                     {'id': '3', 'time': '03:00', 'title': 'Item3'}
                 ]
             }
         )
-        self.client_mock.get_item = Mock(
+        self.client_mock.get_show = Mock(
             return_value={'id': '1', 'time': '01:00', 'title': 'Item1'}
         )
 
@@ -164,11 +164,11 @@ class ORFLibraryProviderTest(unittest.TestCase):
         self.assertEqual(result[0].uri, 'orfradio:oe1/archive/20140914/1')
         self.assertEqual(result[0].name, '01:00: Item1')
 
-    def test_lookup_archive_item(self):
-        uri = str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, 'oe1',
+    def test_lookup_archive_show(self):
+        uri = str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, 'oe1',
                                 '20140914', '1234567'))
         result = self.library.lookup(uri)
-        self.client_mock.get_item.assert_called_once_with(
+        self.client_mock.get_show.assert_called_once_with(
             'oe1', '20140914', '1234567')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].uri, 'orfradio:oe1/archive/20140914/1')
