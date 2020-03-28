@@ -18,7 +18,7 @@ class HttpClient(object):
 
     cache = CacheManager(**parse_cache_config_options(cache_opts))
 
-    @cache.cache('get', expire=60)
+    @cache.cache('get', expire=300)
     def get(self, url):
         try:
             logger.info('Fetching data from \'%s\'.', url)
@@ -119,7 +119,6 @@ class ORFClient(object):
 
     def _get_json(self, uri):
         try:
-            # TODO: cache requested API responses (special case for current day)
             content = self.http_client.get(uri)
             decoder = simplejson.JSONDecoder()
             return decoder.decode(content)
