@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 class ORFUris(object):
     ROOT = 'orfradio'
     stations = [
-        # name, audioapi_slug, loopstream_slug==shoutcast_slug
-        # TODO: use shoutcast_slug in orfradio: urls. then we can set campus audioapi_slug to None and remove the hack around in _browse_station().
-        # TODO: shoutcast_slug is never used
+        # name, audioapi_slug, shoutcast_slug
         ('Ö1', 'oe1', 'oe1'),
         ('Ö3', 'oe3', 'oe3'),
         ('FM4', 'fm4', 'fm4'),
@@ -171,6 +169,10 @@ class ORFLibraryUri(object):
             return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
         raise InvalidORFUri(uri)
+
+    @property
+    def shoutcast(self):
+        return next(shoutcast for (_, slug, shoutcast) in ORFUris.stations if slug == self.station)
 
     def __str__(self):
         if self.uri_type == ORFUriType.ROOT:

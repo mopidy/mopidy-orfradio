@@ -70,7 +70,6 @@ class ORFClient(object):
             }
             for i, track in enumerate(show_rec['items'])
             if track['type'] in ["M", "B", "N"]
-            # types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle(?), [W]erbung
         ]
 
         return {
@@ -79,22 +78,7 @@ class ORFClient(object):
                 'items': items
         }
 
-    def get_live_url(self, station):
-        shoutcast_slug = { # TODO: move this somewhere else
-            'oe1': 'oe1',
-            'oe3': 'oe3',
-            'fm4': 'fm4',
-            'campus': 'oe1campus',
-            'bgl': 'oe2b',
-            'ktn': 'oe2k',
-            'noe': 'oe2n',
-            'ooe': 'oe2o',
-            'sbg': 'oe2s',
-            'stm': 'oe2st',
-            'tir': 'oe2t',
-            'vbg': 'oe2v',
-            'wie': 'oe2w',
-        }.get(station)
+    def get_live_url(self, shoutcast_slug):
         return ORFClient.live_uri % shoutcast_slug
 
     def get_item(self, station, day_id, show_id, item_id):
@@ -149,9 +133,10 @@ def _get_day_label(day_rec):
 def _to_show(i, rec):
     time = dateutil.parser.parse(rec['scheduledISO'])
 
+    # Note: items with times < 06:00 are from the next day and should be last
     return {
         'id': rec['programKey'],
-        'time': time.strftime("%H:%M"), # xxx: if < 06:00 it is from the next day--put at the end
+        'time': time.strftime("%H:%M"),
         'title': rec['title'],
     }
 
@@ -159,7 +144,9 @@ def _generic_title(track):
     types = {
         'M': 'Musik ',
         'B': 'Beitrag ',
-        'N': 'Nachrichten '
+        'N': 'Nachrichten ',
+        'J': 'Jingle ', # (?)
+        'W': 'Werbung ',
     }
     return types.get(track['type'], '') + "ohne Namen"
 
