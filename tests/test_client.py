@@ -12,14 +12,6 @@ class ORFClientTest(unittest.TestCase):
         self.http_client_mock = utils.HttpClientMock()
         self.orf_client = ORFClient(self.http_client_mock)
 
-    def test_get_days(self):
-        days = self.orf_client.get_days('oe1')
-
-        self.assertListEqual(days, [
-            {'id': '20170605', 'label': 'Mon 05. Jun 2017'},
-            {'id': '20170604', 'label': 'Sun 04. Jun 2017'}
-        ])
-
     def test_get_day(self):
         day = self.orf_client.get_day('oe1', '20170604')
 
@@ -34,7 +26,8 @@ class ORFClientTest(unittest.TestCase):
         })
 
     def test_get_show(self):
-        day = self.orf_client.get_show('oe1', '20170604', '0')
+        # This test might be wrong:
+        day = self.orf_client.get_item('oe1', '20170604', '0', '0')
 
         self.assertEqual(day, {
             'id': '0',
