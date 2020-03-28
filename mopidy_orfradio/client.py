@@ -42,19 +42,6 @@ class ORFClient(object):
     def __init__(self, http_client=HttpClient()):
         self.http_client = http_client
 
-    def get_days(self, station):
-
-        def to_day(rec):
-            return {
-                'id': _get_day_id(rec),
-                'label': _get_day_label(rec)
-            }
-
-        json = self._get_archive_json(station)
-        if json is not None:
-            return [to_day(rec) for rec in reversed(json)]
-        return []
-
     def get_day(self, station, day_id):
 
         def to_show(i, rec):
@@ -77,6 +64,28 @@ class ORFClient(object):
                 'shows': shows
         }
 
+    def get_show(self, station, day_id, show_id): # XXX: returns shows, not tracks
+
+        def to_item(i, rec):
+            time = dateutil.parser.parse(rec['startISO'])
+
+            return {
+                'id': str(i),
+                'time': time.strftime("%H:%M:%S"),
+                'title': rec['title'],
+            }
+
+        day_rec = self._get_day_json(station, day_id) # TODO: don't re-fetch
+        items = [to_item(i, broadcast_rec)
+                 for i, broadcast_rec in enumerate(day_rec['broadcasts'])
+                 if broadcast_rec['isBroadcasted']]
+
+        return {
+                'id': day_id,
+                'label': _get_day_label(day_rec),
+                'items': items
+        }
+
     def get_live_url(self, station):
         shoutcast_slug = { # TODO: move this somewhere else
             'oe1': 'oe1',
@@ -95,11 +104,11 @@ class ORFClient(object):
         }.get(station)
         return ORFClient.live_uri % shoutcast_slug
 
-    def get_show(self, station, day_id, show_id):
-        day = self.get_day(station, day_id)
-        return next(show for show in day['shows'] if show['id'] == show_id)
+    def get_item(self, station, day_id, show_id, item_id):
+        show = self.get_show(station, day_id, show_id)
+        return next(item for item in show['items'] if item['id'] == item_id)
 
-    def get_show_url(self, station, day_id, show_id):
+    def get_item_url(self, station, day_id, show_id, item_id): # XXX: returns whole show url
         day_rec = self._get_day_json(station, day_id)
 
         show_id = int(show_id)

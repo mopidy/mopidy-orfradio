@@ -16,7 +16,7 @@ class ORFUris(object):
     ROOT = 'orfradio'
     stations = [
         # name, audioapi_slug, loopstream_slug==shoutcast_slug
-        # TODO: use shoutcast_slug in orfradio: urls. then we can set campus audioapi_slug to None and remove the hack around in _station_directory().
+        # TODO: use shoutcast_slug in orfradio: urls. then we can set campus audioapi_slug to None and remove the hack around in _browse_station().
         # TODO: shoutcast_slug is never used
         ('Ö1', 'oe1', 'oe1'),
         ('Ö3', 'oe3', 'oe3'),
@@ -56,41 +56,51 @@ class ORFLibraryProvider(backend.LibraryProvider):
             return self.root
 
         if library_uri.uri_type == ORFUriType.STATION:
-            return self._station_directory(library_uri.station)
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE:
-            return self._browse_archive(library_uri.station)
+            return self._browse_station(library_uri.station)
 
         if library_uri.uri_type == ORFUriType.ARCHIVE_DAY:
             return self._browse_day(library_uri.station, library_uri.day_id)
+
+        if library_uri.uri_type == ORFUriType.ARCHIVE_SHOW:
+            return self._browse_show(library_uri.station, library_uri.day_id, library_uri.show_id)
 
         logger.warning('ORFLibraryProvider.browse called with uri '
                        'that does not support browsing: \'%s\'.' % uri)
         return []
 
-    def _station_directory(self, station):
+    def _browse_station(self, station):
         name = next(name for (name, slug, _) in ORFUris.stations if slug == station)
         live = Ref.track(uri=str(ORFLibraryUri(ORFUriType.LIVE, station)), name=f'{name} Live')
-        archive = Ref.directory(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE, station)), name=f'{name} 7 Tage')
+        import datetime
+        last_week = [
+            datetime.date.fromordinal(datetime.datetime.today().toordinal() - d)
+                for d in range(8)
+        ]
+        archive = [Ref.directory(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_DAY,
+                                         station, day.strftime("%Y%m%d"))),
+                                 name=day.strftime("%Y-%m-%d %A"))
+                for day in last_week
+        ]
 
         if station == 'campus':
             return [live]
-        return [live, archive]
-
-    def _browse_archive(self, station):
-        return [Ref.directory(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_DAY,
-                                                    station, day['id'])),
-                              name=day['label'])
-                for day in self.client.get_days(station)]
+        return [live] + archive
 
     def _get_track_title(self, item):
         return '%s: %s' % (item['time'], item['title'])
 
     def _browse_day(self, station, day_id):
-        return [Ref.track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW,
+        return [Ref.directory(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW,
                                                 station, day_id, show['id'])),
                           name=self._get_track_title(show))
                 for show in self.client.get_day(station, day_id)['shows']]
+
+    def _browse_show(self, station, day_id, show_id):
+        # TODO XXX:  ORFBackend backend returned bad data: Expected a list of Track, not [Ref.track,...]
+        return [Ref.track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM,
+                                                station, day_id, show_id, item['id'])),
+                          name=self._get_track_title(item))
+                for item in self.client.get_show(station, day_id, show_id)['items']]
 
     def lookup(self, uri):
         try:
@@ -103,23 +113,26 @@ class ORFLibraryProvider(backend.LibraryProvider):
             return [Track(uri=str(library_uri), name='Live')]
 
         if library_uri.uri_type == ORFUriType.STATION:
-            return self._station_directory(library_uri.station)
+            return self._browse_station(library_uri.station)
 
         if library_uri.uri_type == ORFUriType.ARCHIVE_DAY:
             return self._browse_day(library_uri.station, library_uri.day_id)
 
         if library_uri.uri_type == ORFUriType.ARCHIVE_SHOW:
-            return self._lookup_show(library_uri.station, library_uri.day_id, library_uri.show_id)
+            return self._browse_show(library_uri.station, library_uri.day_id, library_uri.show_id)
+
+        if library_uri.uri_type == ORFUriType.ARCHIVE_ITEM:
+            return self._lookup_item(library_uri.station, library_uri.day_id, library_uri.show_id, library_uri.item_id)
 
         logger.warning('ORFLibraryProvider.lookup called with uri '
                        'that does not support lookup: \'%s\'.' % uri)
         return []
 
-    def _lookup_show(self, station, day_id, show_id):
-        show = self.client.get_show(station, day_id, show_id)
-        return [Track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station,
-                                            day_id, show['id'])),
-                      name=self._get_track_title(show))]
+    def _lookup_item(self, station, day_id, show_id, item_id):
+        item = self.client.get_item(station, day_id, show_id, item_id)
+        return [Track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station,
+                                            day_id, show_id, item['id'])),
+                      name=self._get_track_title(item))]
 
     def refresh(self, uri=None):
         self.client.refresh()
@@ -136,22 +149,22 @@ class ORFLibraryUri(object):
     @staticmethod
     def parse(uri):
         scheme, _, path, _, _ = urllib.parse.urlsplit(uri)
-        station, browse, day, show, *_ = path.split('/', 4) + [None]*4
+        station, live_or_day, show, item, *_ = path.split('/', 4) + 4*[None]
 
         if station == '':
             return ORFLibraryUri(ORFUriType.ROOT)
         if station not in [slug for (name, slug, _) in ORFUris.stations]:
             raise InvalidORFUri(uri)
-        if browse is None:
+        if live_or_day is None:
             return ORFLibraryUri(ORFUriType.STATION, station)
-        if browse == 'live':
+        if live_or_day == 'live':
             return ORFLibraryUri(ORFUriType.LIVE, station)
-        if browse == 'archive':
+        if live_or_day:
+            if item:
+                return ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item)
             if show:
-                return ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, day, show)
-            if day:
-                return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, day)
-            return ORFLibraryUri(ORFUriType.ARCHIVE, station)
+                return ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, live_or_day, show)
+            return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
         raise InvalidORFUri(uri)
 
@@ -162,12 +175,12 @@ class ORFLibraryUri(object):
             return f'{ORFUris.ROOT}:{self.station}'
         if self.uri_type == ORFUriType.LIVE:
             return f'{ORFUris.ROOT}:{self.station}/live'
-        if self.uri_type == ORFUriType.ARCHIVE:
-            return f'{ORFUris.ROOT}:{self.station}/archive'
         if self.uri_type == ORFUriType.ARCHIVE_DAY:
-            return f'{ORFUris.ROOT}:{self.station}/archive/{self.day_id}'
+            return f'{ORFUris.ROOT}:{self.station}/{self.day_id}'
         if self.uri_type == ORFUriType.ARCHIVE_SHOW:
-            return f'{ORFUris.ROOT}:{self.station}/archive/{self.day_id}/{self.show_id}'
+            return f'{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}'
+        if self.uri_type == ORFUriType.ARCHIVE_ITEM:
+            return f'{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}'
 
 
 class InvalidORFUri(TypeError):
@@ -180,7 +193,6 @@ class ORFUriType(object):
     ROOT = 0
     STATION = 1
     LIVE = 2
-    ARCHIVE = 3
-    ARCHIVE_DAY = 4
-    ARCHIVE_SHOW = 5
-    ARCHIVE_ITEM = 6
+    ARCHIVE_DAY = 3
+    ARCHIVE_SHOW = 4
+    ARCHIVE_ITEM = 5
