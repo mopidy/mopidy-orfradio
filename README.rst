@@ -2,17 +2,17 @@
 Mopidy-ORFRadio
 ****************************
 
-.. image:: https://pypip.in/v/Mopidy-OE1/badge.png
-    :target: https://pypi.python.org/pypi/Mopidy-OE1/
+.. image:: https://img.shields.io/pypi/v/Mopidy-ORFRadio
+    :target: https://pypi.org/project/Mopidy-ORFRadio/
     :alt: Latest PyPI version
 
-.. image:: https://travis-ci.org/tischlda/mopidy-oe1.png?branch=master
-    :target: https://travis-ci.org/tischlda/mopidy-oe1
-    :alt: Travis CI build status
+.. image:: https://img.shields.io/circleci/build/gh/girst/mopidy-orfradio
+    :target: https://circleci.com/gh/girst/mopidy-orfradio
+    :alt: CircleCI build status
 
-.. image:: https://coveralls.io/repos/tischlda/mopidy-oe1/badge.png?branch=master
-   :target: https://coveralls.io/r/tischlda/mopidy-oe1?branch=master
-   :alt: Test coverage
+.. image:: https://img.shields.io/codecov/c/gh/girst/mopidy-orfradio
+    :target: https://codecov.io/gh/girst/mopidy-orfradio
+    :alt: Test coverage
 
 `Mopidy <http://www.mopidy.com/>`_ extension to access the `Austrian ORF radio
 stations <https://radiothek.orf.at/>`_.  It provides access to the live streams
@@ -23,14 +23,22 @@ Installation
 
 Install by running::
 
-    sudo pip install Mopidy-ORFRadio
+    python3 -m pip install Mopidy-ORFRadio
+
+See https://mopidy.com/ext/orfradio/ for alternative installation methods.
 
 
-Changelog
-=========
+Project resources
+=================
 
-v2.0.0 (2019-12-08)
--------------------
-- Forked from `Mopidy-OE1 <https://github.com/tischlda/mopidy-oe1>`_ 1.2.0.
-- Ported to Python 3 (Tobias Girstmair `girst <https://gir.st/>`_)
-- Extended for all ORF radio stations
+- `Source code <https://github.com/girst/mopidy-orfradio>`_
+- `Issue tracker <https://github.com/girst/mopidy-orfradio/issues>`_
+- `Changelog <https://github.com/girst/mopidy-orfradio/blob/master/CHANGELOG.rst>`_
+
+
+Credits
+=======
+
+- Original author: `Tobias Girstmair <https://gir.st/>`__, `David Tischler <https://github.com/tischlda>`__
+- Current maintainer: `Tobias Girstmair <https://gir.st/>`__
+- `Contributors <https://github.com/girst/mopidy-orfradio/graphs/contributors>`_
