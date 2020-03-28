@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 
 def get_version(filename):
     content = open(filename).read()
-    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", content))
+    metadata = dict(re.findall('__([a-z]+)__ = "([^"]+)"', content))
     return metadata['version']
 
 
