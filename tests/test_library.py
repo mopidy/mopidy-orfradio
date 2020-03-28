@@ -36,10 +36,6 @@ class ORFLibraryUriTest(unittest.TestCase):
         self.assertEqual(result.uri_type, ORFUriType.ARCHIVE_DAY)
         self.assertEqual(result.day_id, '20140914')
 
-    def test_parse_invalid_uri(self):
-        uri = 'foo:bar'
-        self.assertRaises(TypeError, ORFLibraryUri.parse, uri)
-
     def test_parse_show_uri(self):
         uri = 'orfradio:oe1/20140914/382176'
         result = ORFLibraryUri.parse(uri)
@@ -87,7 +83,7 @@ class ORFLibraryProviderTest(unittest.TestCase):
         )
         self.client_mock.get_show = Mock(
             return_value={
-                'items': [ # XXX
+                'items': [
                     {'id': '1', 'time': '01:00', 'title': 'Item1'},
                     {'id': '2', 'time': '02:00', 'title': 'Item2'},
                     {'id': '3', 'time': '03:00', 'title': 'Item3'}

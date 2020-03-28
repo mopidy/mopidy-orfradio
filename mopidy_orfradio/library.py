@@ -69,7 +69,10 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return []
 
     def _browse_station(self, station):
-        name = next(name for (name, slug, _) in ORFUris.stations if slug == station)
+        try:
+            name = next(name for (name, slug, _) in ORFUris.stations if slug == station)
+        except StopIteration:
+            return []
         live = Ref.track(uri=str(ORFLibraryUri(ORFUriType.LIVE, station)), name=f'{name} Live')
         import datetime
         last_week = [
