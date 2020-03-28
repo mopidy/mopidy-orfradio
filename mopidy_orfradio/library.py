@@ -5,7 +5,7 @@ import re
 import urllib
 
 from mopidy import backend
-from mopidy.models import Ref, Track
+from mopidy.models import Ref, Track, Artist, Album
 
 from .client import ORFClient
 
@@ -131,7 +131,11 @@ class ORFLibraryProvider(backend.LibraryProvider):
         item = self.client.get_item(station, day_id, show_id, item_id)
         return [Track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station,
                                             day_id, show_id, item['id'])),
-                      name=self._get_track_title(item))]
+                      artists=[Artist(name=item['artist'])],
+                      length=item['length'],
+                      album=Album(name=item['show_long']),
+                      genre=item['type'],
+                      name=item['title'])]
 
     def refresh(self, uri=None):
         self.client.refresh()

@@ -56,22 +56,21 @@ class ORFClient(object):
 
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
-        items = [{'id': f'{track["start"]}+{track["duration"]}', 'title': track.get("title","??"), 'time': track['startISO']}
-                 for i, track in enumerate(show_rec['items'])
-                 if track['type'] in ["M", "B", "N", "W", "not-J"]
-                 ]
-        """
-- .items[].{type=="M",duration,start,end,title,interpreter}
-  music.
-- .items[].{type=="B",duration,start,end,title}
-  Beitrag
-- .items[].{type=="N",duration,start,end,title}
-  News
-- .items[].{type=="W"}
-  musik-Wunsch
-- .items[].{type=="J"}
-  interlude (adbreak, silence, jingle, moderation, ...)
-"""
+        items = [
+            {   # Note: timestamps are rounded to 1000ms, so switching between tracks is glitchy.
+                # Note: we use .get(x) or '' and not .get(x, ''), because the field can be absent or null and we want both to be replaced by the empty string.
+                'id': f'{track["start"]}-{track["end"]}',
+                'title': track.get("title") or '',
+                'time': track['startISO'],
+                'artist': track.get('interpreter') or '',
+                'length': track['duration'],
+                'show_long': show_rec['title'],
+                'type': track['type']
+            }
+            for i, track in enumerate(show_rec['items'])
+            if track['type'] in ["M", "B", "N"]
+            # Track types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle(?), [W]erbung
+        ]
 
         return {
                 'id': show_id,
@@ -79,7 +78,6 @@ class ORFClient(object):
                 'items': items
         }
 
-#{{{
     def get_live_url(self, station):
         shoutcast_slug = { # TODO: move this somewhere else
             'oe1': 'oe1',
@@ -98,7 +96,6 @@ class ORFClient(object):
         }.get(station)
         return ORFClient.live_uri % shoutcast_slug
 
-#}}}
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
         return next(item for item in show['items'] if item['id'] == item_id)
@@ -110,11 +107,11 @@ class ORFClient(object):
         if len(streams) == 0:
             return ""
 
-        item_start, duration = item_id.split('+', 1)
+        item_start, item_end = item_id.split('-', 1)
         stream = next(stream for stream in reversed(streams) if stream['start'] <= int(item_start))
         streamId = stream['loopStreamId']
         offsetstart = int(item_start) - stream['start']
-        offsetende = offsetstart + int(duration)
+        offsetende = int(item_end) - stream['start']
         return ORFClient.show_uri % (station, streamId, offsetstart, offsetende)
 
     def refresh(self):
