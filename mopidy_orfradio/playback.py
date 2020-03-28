@@ -26,7 +26,9 @@ class ORFPlaybackProvider(backend.PlaybackProvider):
             return self.client.get_live_url(library_uri.shoutcast)
 
         if library_uri.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return self.client.get_item_url(library_uri.station,
-                                            library_uri.day_id,
-                                            library_uri.show_id,
-                                            library_uri.item_id)
+            return self.client.get_item_url(
+                library_uri.station,
+                library_uri.day_id,
+                library_uri.show_id,
+                library_uri.item_id,
+            )
