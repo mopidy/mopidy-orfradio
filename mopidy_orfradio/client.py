@@ -57,11 +57,12 @@ class ORFClient(object):
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
         items = [
-            {   # Note: timestamps are rounded to 1000ms, so switching between tracks is glitchy.
-                # Note: we use .get(x) or '' and not .get(x, ''), because the field can be absent or null and we want both to be replaced by the empty string.
-                'id': f'{track["start"]}-{track["end"]}',
+            {
+                'id': _generate_id(show_rec, i),
                 'title': track.get("title") or _generic_title(track),
                 'time': track['startISO'],
+                # Note: .interpreter can be absent or null. the following
+                # statement accounts for both:
                 'artist': track.get('interpreter') or '',
                 'length': track['duration'],
                 'show_long': show_rec['title'],
@@ -69,7 +70,7 @@ class ORFClient(object):
             }
             for i, track in enumerate(show_rec['items'])
             if track['type'] in ["M", "B", "N"]
-            # Track types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle(?), [W]erbung
+            # types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle(?), [W]erbung
         ]
 
         return {
@@ -107,11 +108,11 @@ class ORFClient(object):
         if len(streams) == 0:
             return ""
 
-        item_start, item_end = item_id.split('-', 1)
+        item_start, item_end, *_ = item_id.split('-', 1) + 1*[None]
         stream = next(stream for stream in reversed(streams) if stream['start'] <= int(item_start))
         streamId = stream['loopStreamId']
         offsetstart = int(item_start) - stream['start']
-        offsetende = int(item_end) - stream['start']
+        offsetende = int(item_end) - stream['start'] if item_end else ''
         return ORFClient.show_uri % (station, streamId, offsetstart, offsetende)
 
     def refresh(self):
@@ -161,3 +162,11 @@ def _generic_title(track):
         'N': 'Nachrichten '
     }
     return types.get(track['type'], '') + "ohne Namen"
+
+def _generate_id(show_rec, i):
+    start = show_rec["items"][i]["start"]
+    if i+1 < len(show_rec["items"]):
+        end = show_rec["items"][i+1]["start"]
+        return f'{start}-{end}'
+    else:
+        return f'{start}'
