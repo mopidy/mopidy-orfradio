@@ -96,7 +96,6 @@ class ORFLibraryProvider(backend.LibraryProvider):
                 for show in self.client.get_day(station, day_id)['shows']]
 
     def _browse_show(self, station, day_id, show_id):
-        # TODO XXX:  ORFBackend backend returned bad data: Expected a list of Track, not [Ref.track,...]
         return [Ref.track(uri=str(ORFLibraryUri(ORFUriType.ARCHIVE_ITEM,
                                                 station, day_id, show_id, item['id'])),
                           name=self._get_track_title(item))
@@ -153,13 +152,11 @@ class ORFLibraryUri(object):
 
         if station == '':
             return ORFLibraryUri(ORFUriType.ROOT)
-        if station not in [slug for (name, slug, _) in ORFUris.stations]:
-            raise InvalidORFUri(uri)
         if live_or_day is None:
             return ORFLibraryUri(ORFUriType.STATION, station)
-        if live_or_day == 'live':
+        elif live_or_day == 'live':
             return ORFLibraryUri(ORFUriType.LIVE, station)
-        if live_or_day:
+        else:
             if item:
                 return ORFLibraryUri(ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item)
             if show:
