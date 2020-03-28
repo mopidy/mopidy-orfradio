@@ -35,7 +35,7 @@ class HttpClient(object):
 
 class ORFClient(object):
     archive_uri = 'http://audioapi.orf.at/%s/json/2.0/broadcasts/'
-    record_uri = 'https://audioapi.orf.at/%s/api/json/current/broadcast/%s/%s'
+    record_uri = 'https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s'
     show_uri = 'http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s'
     live_uri = "https://%sshoutcast.sf.apa.at/;"
 
