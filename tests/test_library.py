@@ -29,11 +29,6 @@ class ORFLibraryUriTest(unittest.TestCase):
         result = ORFLibraryUri.parse(uri)
         self.assertEqual(result.uri_type, ORFUriType.LIVE)
 
-    def test_parse_station_uri(self):
-        uri = "orfradio:oe1"
-        result = ORFLibraryUri.parse(uri)
-        self.assertEqual(result.uri_type, ORFUriType.STATION)
-
     def test_parse_day_uri(self):
         uri = "orfradio:oe1/20140914"
         result = ORFLibraryUri.parse(uri)
@@ -58,10 +53,6 @@ class ORFLibraryUriTest(unittest.TestCase):
     def test_create_live_uri(self):
         parsed_uri = ORFLibraryUri(ORFUriType.LIVE, "oe1")
         self.assertEqual(str(parsed_uri), "orfradio:oe1/live")
-
-    def test_create_station_uri(self):
-        parsed_uri = ORFLibraryUri(ORFUriType.STATION, "oe1")
-        self.assertEqual(str(parsed_uri), "orfradio:oe1")
 
     def test_create_day_uri(self):
         parsed_uri = ORFLibraryUri(ORFUriType.ARCHIVE_DAY, "oe1", "20140914")

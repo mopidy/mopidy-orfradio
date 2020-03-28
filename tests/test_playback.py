@@ -4,7 +4,6 @@ import unittest
 
 from mock import Mock
 
-from mopidy_orfradio.client import ORFClient
 from mopidy_orfradio.playback import (
     ORFLibraryUri,
     ORFPlaybackProvider,
