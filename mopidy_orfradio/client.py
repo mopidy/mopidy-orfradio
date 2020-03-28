@@ -60,7 +60,7 @@ class ORFClient(object):
             {   # Note: timestamps are rounded to 1000ms, so switching between tracks is glitchy.
                 # Note: we use .get(x) or '' and not .get(x, ''), because the field can be absent or null and we want both to be replaced by the empty string.
                 'id': f'{track["start"]}-{track["end"]}',
-                'title': track.get("title") or '',
+                'title': track.get("title") or _generic_title(track),
                 'time': track['startISO'],
                 'artist': track.get('interpreter') or '',
                 'length': track['duration'],
@@ -153,3 +153,11 @@ def _to_show(i, rec):
         'time': time.strftime("%H:%M"), # xxx: if < 06:00 it is from the next day--put at the end
         'title': rec['title'],
     }
+
+def _generic_title(track):
+    types = {
+        'M': 'Musik ',
+        'B': 'Beitrag ',
+        'N': 'Nachrichten '
+    }
+    return types.get(track['type'], '') + "ohne Namen"
