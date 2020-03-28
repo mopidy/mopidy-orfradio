@@ -146,10 +146,10 @@ def _get_day_label(day_rec):
     return time.strftime("%a %d. %b %Y")
 
 def _to_show(i, rec):
-    time = dateutil.parser.parse(rec['startISO'])
+    time = dateutil.parser.parse(rec['scheduledISO'])
 
     return {
         'id': rec['programKey'],
-        'time': time.strftime("%H:%M:%S"),
+        'time': time.strftime("%H:%M"), # xxx: if < 06:00 it is from the next day--put at the end
         'title': rec['title'],
     }
