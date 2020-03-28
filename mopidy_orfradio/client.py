@@ -68,7 +68,7 @@ class ORFClient(object):
             if track["type"] in ["M", "B", "N"]
         ]
 
-        return {"id": show_id, "label": "whoknows", "items": items}
+        return {"id": show_id, "label": show_rec["title"], "items": items}
 
     def get_live_url(self, shoutcast_slug):
         return ORFClient.live_uri % shoutcast_slug

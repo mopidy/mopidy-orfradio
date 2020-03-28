@@ -69,7 +69,7 @@
       "isOnDemand": true,
       "isGeoProtected": false,
       "isCompleted": true,
-      "duration": null,
+      "duration": 12345,
       "title": "Nachrichten",
       "subtitle": null,
       "moderator": null,

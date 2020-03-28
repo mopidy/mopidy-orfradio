@@ -26,17 +26,24 @@ class ORFClientTest(unittest.TestCase):
             },
         )
 
-    @unittest.skip("This test might be wrong")
-    def test_get_item(self):
-        day = self.orf_client.get_item(
-            "oe1", "20170604", "475617", "1496566789000-1496566977000"
-        )
+    def test_get_show(self):
+        day = self.orf_client.get_show("oe1", "20170604", "475617")
 
         self.assertEqual(
             day,
             {
-                "id": "1496566789000-1496566977000",
-                "title": "Nachrichten",
-                "time": "10:59",
+                "id": "475617",
+                "label": "Nachrichten",
+                "items": [
+                    {
+                        "id": "1496566789000",
+                        "title": "Nachrichten",
+                        "time": "2017-06-04T10:59:49+02:00",
+                        "artist": "",
+                        "length": 12345,
+                        "show_long": "Nachrichten",
+                        "type": "N",
+                    }
+                ],
             },
         )
