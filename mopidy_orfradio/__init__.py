@@ -23,6 +23,9 @@ class Extension(ext.Extension):
 
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
+        schema["stations"] = config.List()
+        schema["afterhours"] = config.Boolean()
+        schema["archive_types"] = config.List()
         return schema
 
     def setup(self, registry):

@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class ORFPlaybackProvider(backend.PlaybackProvider):
-    def __init__(self, audio, backend, client=ORFClient()):
+    def __init__(self, audio, backend, client=None):
         super(ORFPlaybackProvider, self).__init__(audio, backend)
-        self.client = client
+        self.client = client or ORFClient(backend=self.backend)
 
     def translate_uri(self, uri):
         try:

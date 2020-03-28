@@ -28,6 +28,36 @@ Install by running::
 See https://mopidy.com/ext/orfradio/ for alternative installation methods.
 
 
+Configuration
+=============
+
+Before starting Mopidy, you must add configuration for
+Mopidy-ORFRadio to your Mopidy configuration file::
+
+    [orfradio]
+    # stations to display (defaults to all)
+    stations =
+        oe1
+        oe3
+        fm4
+        campus
+        bgl
+        ktn
+        noe
+        ooe
+        sbg
+        stm
+        tir
+        vbg
+
+    # disable to automatically skip over certain track types.
+    # available types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle, [W]erbung
+    archive_types =
+        M
+        B
+        N
+
+
 Project resources
 =================
 

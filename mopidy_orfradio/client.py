@@ -37,8 +37,12 @@ class ORFClient(object):
     show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"
     live_uri = "https://%sshoutcast.sf.apa.at/;"
 
-    def __init__(self, http_client=HttpClient()):
+    def __init__(self, http_client=HttpClient(), backend=None):
         self.http_client = http_client
+        if backend:
+            self.media_types = backend.config["orfradio"]["archive_types"]
+        else:
+            self.media_types = ["M", "B", "N"]
 
     def get_day(self, station, day_id):
         day_rec = self._get_day_json(station, day_id)
@@ -65,7 +69,7 @@ class ORFClient(object):
                 "type": track["type"],
             }
             for i, track in enumerate(show_rec["items"])
-            if track["type"] in ["M", "B", "N"]
+            if track["type"] in self.media_types
         ]
 
         return {"id": show_id, "label": show_rec["title"], "items": items}

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import re
 import urllib
 
 from mopidy import backend
@@ -33,14 +34,15 @@ class ORFUris(object):
 
 class ORFLibraryProvider(backend.LibraryProvider):
     root_directory = Ref.directory(uri=f"{ORFUris.ROOT}:", name="ORF Radio")
-    root = [
-        Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
-        for (name, slug, _) in ORFUris.stations
-    ]
 
-    def __init__(self, backend, client=ORFClient()):
+    def __init__(self, backend, client=None):
         super(ORFLibraryProvider, self).__init__(backend)
-        self.client = client
+        self.client = client or ORFClient(backend=self.backend)
+        self.root = [
+            Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
+            for (name, slug, _) in ORFUris.stations
+            if slug in self.backend.config["orfradio"]["stations"]
+        ]
 
     def browse(self, uri):
         try:
@@ -102,8 +104,11 @@ class ORFLibraryProvider(backend.LibraryProvider):
             return [live]
         return [live] + archive
 
-    def _get_track_title(self, item):
-        return "%s: %s" % (item["time"], item["title"])
+    def _get_track_title(self, item, afterhours=False):
+        time = item["time"]
+        if afterhours and self.backend.config["orfradio"]["afterhours"]:
+            time = re.sub(r"^0([0-5]:)", r"O\1", time)
+        return "%s: %s" % (time, item["title"])
 
     def _browse_day(self, station, day_id):
         return [
@@ -113,7 +118,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
                         ORFUriType.ARCHIVE_SHOW, station, day_id, show["id"]
                     )
                 ),
-                name=self._get_track_title(show),
+                name=self._get_track_title(show, afterhours=True),
             )
             for show in self.client.get_day(station, day_id)["shows"]
         ]
