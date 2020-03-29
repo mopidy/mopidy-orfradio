@@ -1,8 +1,7 @@
-from __future__ import unicode_literals
-
 import unittest
+import datetime
 
-from mock import Mock
+from unittest.mock import Mock
 
 from mopidy.models import Ref
 
@@ -112,8 +111,6 @@ class ORFLibraryProviderTest(unittest.TestCase):
         self.assertEqual(len(result), 2)
 
     def test_browse_station(self):
-        import datetime
-
         uri = str(ORFLibraryUri(ORFUriType.STATION, "oe1"))
         result = self.library.browse(uri)
         self.assertEqual(len(result), 9)

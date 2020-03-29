@@ -6,7 +6,7 @@ from beaker.util import parse_cache_config_options
 
 import dateutil.parser
 
-import simplejson
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -105,8 +105,7 @@ class ORFClient(object):
     def _get_json(self, uri):
         try:
             content = self.http_client.get(uri)
-            decoder = simplejson.JSONDecoder()
-            return decoder.decode(content)
+            return json.loads(content)
         except Exception as e:
             logger.error(
                 "Error decoding content received from '%s': %s", uri, e

@@ -1,8 +1,7 @@
-from __future__ import unicode_literals
-
 import logging
 import re
 import urllib
+import datetime
 
 from mopidy import backend
 from mopidy.models import Ref, Track, Artist, Album
@@ -82,7 +81,6 @@ class ORFLibraryProvider(backend.LibraryProvider):
             uri=str(ORFLibraryUri(ORFUriType.LIVE, station)),
             name=f"{name} Live",
         )
-        import datetime
 
         last_week = [
             datetime.date.fromordinal(datetime.datetime.today().toordinal() - d)

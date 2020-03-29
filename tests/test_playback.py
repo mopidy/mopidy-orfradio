@@ -1,8 +1,6 @@
-from __future__ import unicode_literals
-
 import unittest
 
-from mock import Mock
+from unittest.mock import Mock
 
 from mopidy_orfradio.playback import (
     ORFLibraryUri,
