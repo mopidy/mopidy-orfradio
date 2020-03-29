@@ -89,8 +89,12 @@ class ORFLibraryProviderTest(unittest.TestCase):
         self.client_mock.get_item = Mock(
             return_value={"id": "1", "time": "01:00", "title": "Item1"}
         )
+        self.backend = Mock()
+        self.backend.config = {
+            "orfradio": {"stations": ["oe1", "fm4"], "afterhours": False}
+        }
 
-        self.library = ORFLibraryProvider(None, client=self.client_mock)
+        self.library = ORFLibraryProvider(self.backend, client=self.client_mock)
 
     def test_browse_invalid_uri(self):
         uri = "foo:bar"
@@ -105,7 +109,7 @@ class ORFLibraryProviderTest(unittest.TestCase):
     def test_browse_root(self):
         uri = str(ORFLibraryUri(ORFUriType.ROOT))
         result = self.library.browse(uri)
-        self.assertEqual(len(result), 13)
+        self.assertEqual(len(result), 2)
 
     def test_browse_station(self):
         import datetime
