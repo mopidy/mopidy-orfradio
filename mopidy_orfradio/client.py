@@ -5,6 +5,7 @@ from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
 
 import dateutil.parser
+import datetime
 
 import json
 
@@ -46,10 +47,14 @@ class ORFClient(object):
 
     def get_day(self, station, day_id):
         day_rec = self._get_day_json(station, day_id)
+        now = lambda offset: datetime.datetime.now(
+            datetime.timezone(datetime.timedelta(milliseconds=offset))
+        )
         shows = [
             _to_show(i, broadcast_rec)
             for i, broadcast_rec in enumerate(day_rec["broadcasts"])
-            if broadcast_rec["isBroadcasted"]
+            if dateutil.parser.parse(broadcast_rec["startISO"])
+            < now(broadcast_rec["endOffset"])
         ]
 
         return {"id": day_id, "label": _get_day_label(day_rec), "shows": shows}
@@ -138,7 +143,7 @@ def _to_show(i, rec):
     return {
         "id": rec["programKey"],
         "time": time.strftime("%H:%M"),
-        "title": rec["title"],
+        "title": rec["title"] + (" *" if not rec["isBroadcasted"] else ""),
     }
 
 
