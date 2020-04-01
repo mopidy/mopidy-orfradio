@@ -16,7 +16,7 @@ Mopidy-ORFRadio
 
 `Mopidy <http://www.mopidy.com/>`_ extension to access the `Austrian ORF radio
 stations <https://radiothek.orf.at/>`_.  It provides access to the live streams
-and the 7-day-archive.
+and the 7 day archive.
 
 Installation
 ============
@@ -31,11 +31,14 @@ See https://mopidy.com/ext/orfradio/ for alternative installation methods.
 Configuration
 =============
 
-Before starting Mopidy, you must add configuration for
+Before starting Mopidy, you may add configuration for
 Mopidy-ORFRadio to your Mopidy configuration file::
 
     [orfradio]
-    # stations to display (defaults to all)
+
+    # Stations to display
+    #
+    # Default:
     stations =
         oe1
         oe3
@@ -50,8 +53,10 @@ Mopidy-ORFRadio to your Mopidy configuration file::
         tir
         vbg
 
-    # disable to automatically skip over certain track types.
-    # available types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle, [W]erbung
+    # Remove from list to automatically skip tracks of the type.
+    #
+    # Available types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle, [W]erbung
+    # Default:
     archive_types =
         M
         B
