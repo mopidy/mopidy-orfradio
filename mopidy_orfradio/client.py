@@ -20,7 +20,7 @@ class HttpClient(object):
     @cache.cache("get", expire=300)
     def get(self, url):
         try:
-            logger.info("Fetching data from '%s'.", url)
+            logger.debug("Fetching data from %r", url)
             response = urllib.request.urlopen(url)
             content = response.read()
             encoding = response.headers["content-type"].split("charset")[-1]
