@@ -20,7 +20,7 @@ class Extension(ext.Extension):
         return config.read(conf_file)
 
     def get_config_schema(self):
-        schema = super(Extension, self).get_config_schema()
+        schema = super().get_config_schema()
         schema["stations"] = config.List()
         schema["afterhours"] = config.Boolean()
         schema["archive_types"] = config.List()

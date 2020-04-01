@@ -11,7 +11,7 @@ from .client import ORFClient
 logger = logging.getLogger(__name__)
 
 
-class ORFUris(object):
+class ORFUris:
     ROOT = "orfradio"
     stations = [
         # name, audioapi_slug, shoutcast_slug
@@ -35,7 +35,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
     root_directory = Ref.directory(uri=f"{ORFUris.ROOT}:", name="ORF Radio")
 
     def __init__(self, backend, client=None):
-        super(ORFLibraryProvider, self).__init__(backend)
+        super().__init__(backend)
         self.client = client or ORFClient(backend=self.backend)
         self.root = [
             Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
@@ -106,7 +106,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         time = item["time"]
         if afterhours and self.backend.config["orfradio"]["afterhours"]:
             time = re.sub(r"^0([0-5]:)", r"O\1", time)
-        return "%s: %s" % (time, item["title"])
+        return "{}: {}".format(time, item["title"])
 
     def _browse_day(self, station, day_id):
         return [
@@ -198,7 +198,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         self.client.refresh()
 
 
-class ORFLibraryUri(object):
+class ORFLibraryUri:
     def __init__(
         self,
         uri_type,
@@ -267,7 +267,7 @@ class InvalidORFUri(TypeError):
         )
 
 
-class ORFUriType(object):
+class ORFUriType:
     ROOT = 0
     STATION = 1
     LIVE = 2

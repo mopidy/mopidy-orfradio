@@ -1,7 +1,7 @@
 import os
 
 
-class HttpClientMock(object):
+class HttpClientMock:
     def __init__(self):
         thisdir = os.path.dirname(__file__)
         self.urlMappings = {
@@ -11,5 +11,5 @@ class HttpClientMock(object):
 
     def get(self, url):
         file_name = self.urlMappings[url]
-        with open(file_name, "r") as content_file:
+        with open(file_name) as content_file:
             return content_file.read()

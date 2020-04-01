@@ -12,7 +12,7 @@ import json
 logger = logging.getLogger(__name__)
 
 
-class HttpClient(object):
+class HttpClient:
     cache_opts = {"cache.type": "memory"}
 
     cache = CacheManager(**parse_cache_config_options(cache_opts))
@@ -32,7 +32,7 @@ class HttpClient(object):
         self.cache.invalidate(self.get, "get")
 
 
-class ORFClient(object):
+class ORFClient:
     archive_uri = "http://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
     show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950

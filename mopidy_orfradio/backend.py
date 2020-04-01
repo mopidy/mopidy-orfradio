@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class ORFBackend(pykka.ThreadingActor, backend.Backend):
     def __init__(self, config, audio):
-        super(ORFBackend, self).__init__()
+        super().__init__()
 
         self.config = config
 
