@@ -35,10 +35,10 @@ class HttpClient(object):
 class ORFClient(object):
     archive_uri = "http://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
-    show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"
+    show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
     live_uri = "https://%sshoutcast.sf.apa.at/;"
 
-    def __init__(self, http_client=HttpClient(), backend=None):
+    def __init__(self, http_client=HttpClient(), backend=None):  # noqa: B008
         self.http_client = http_client
         if backend:
             self.media_types = backend.config["orfradio"]["archive_types"]
@@ -47,9 +47,12 @@ class ORFClient(object):
 
     def get_day(self, station, day_id):
         day_rec = self._get_day_json(station, day_id)
-        now = lambda offset: datetime.datetime.now(
-            datetime.timezone(datetime.timedelta(milliseconds=offset))
-        )
+
+        def now(offset):
+            return datetime.datetime.now(
+                datetime.timezone(datetime.timedelta(milliseconds=offset))
+            )
+
         shows = [
             _to_show(i, broadcast_rec)
             for i, broadcast_rec in enumerate(day_rec["broadcasts"])

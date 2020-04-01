@@ -257,7 +257,7 @@ class ORFLibraryUri(object):
         if self.uri_type == ORFUriType.ARCHIVE_SHOW:
             return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}"
         if self.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}"
+            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}"  # noqa: B950
 
 
 class InvalidORFUri(TypeError):

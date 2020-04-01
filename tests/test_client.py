@@ -12,7 +12,7 @@ class ORFClientTest(unittest.TestCase):
 
     def test_get_day(self):
         day = self.orf_client.get_day("oe1", "20170604")
-        day['shows'] = day['shows'][:1] # only test against first show
+        day["shows"] = day["shows"][:1]  # only test against first show
 
         self.assertEqual(
             day,
