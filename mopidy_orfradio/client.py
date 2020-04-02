@@ -87,7 +87,11 @@ class ORFClient:
 
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
-        return next(item for item in show["items"] if item["id"] == item_id)
+        return next(
+            item
+            for item in show["items"]
+            if item["id"].split("-")[0] == item_id.split("-")[0]
+        )
 
     def get_item_url(self, station, day_id, show_id, item_id):
         json = self._get_record_json(station, show_id, day_id)
