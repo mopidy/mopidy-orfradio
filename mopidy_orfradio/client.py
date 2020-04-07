@@ -79,6 +79,20 @@ class ORFClient:
             for i, track in enumerate(show_rec["items"])
             if track["type"] in self.media_types
         ]
+        if not items:
+            # if the show contains no items, or none we are interested in, play
+            # the whole show.
+            items = [
+                {
+                    "id": str(show_rec["start"]),
+                    "title": show_rec["title"],
+                    "time": show_rec["startISO"],
+                    "artist": show_rec.get("moderator") or "",
+                    "length": show_rec["end"] - show_rec["start"],
+                    "show_long": show_rec["title"],
+                    "type": "",
+                }
+            ]
 
         return {"id": show_id, "label": show_rec["title"], "items": items}
 

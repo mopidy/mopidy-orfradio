@@ -55,11 +55,13 @@ Mopidy-ORFRadio to your Mopidy configuration file::
 
     # Remove from list to automatically skip tracks of the type.
     #
-    # Available types: [M]usik, [B]eitrag, [N]achrichten, [J]ingle, [W]erbung
+    # available types: [M]usik, [B]eitrag, [BJ]ournal, [N]achrichten,
+    # [J]ingle, [W]erbung, [S]onstiges
     # Default:
     archive_types =
         M
         B
+        BJ
         N
 
 
