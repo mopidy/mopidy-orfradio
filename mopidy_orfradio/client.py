@@ -8,6 +8,7 @@ import dateutil.parser
 import datetime
 
 import json
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class ORFClient:
         items = [
             {
                 "id": _generate_id(show_rec, i),
-                "title": track.get("title") or _generic_title(track),
+                "title": _mojibake(track.get("title") or _generic_title(track)),
                 "time": track["startISO"],
                 # Note: .interpreter can be absent or null. the following
                 # statement accounts for both:
@@ -85,7 +86,7 @@ class ORFClient:
             items = [
                 {
                     "id": str(show_rec["start"]),
-                    "title": show_rec["title"],
+                    "title": _mojibake(show_rec["title"]),
                     "time": show_rec["startISO"],
                     "artist": show_rec.get("moderator") or "",
                     "length": show_rec["end"] - show_rec["start"],
@@ -186,3 +187,10 @@ def _generate_id(show_rec, i):
         return f"{start}-{end}"
     else:
         return f"{start}"
+
+
+def _mojibake(s):
+    """
+    The API sometimes returns titles with characters in the C1 control block.
+    """
+    return re.sub("[\x80-\x9f]", "", s)

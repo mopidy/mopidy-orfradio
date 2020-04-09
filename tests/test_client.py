@@ -68,3 +68,21 @@ class ORFClientTest(unittest.TestCase):
                 ],
             },
         )
+
+    def test_get_item_broken_unicode(self):
+        show = self.orf_client.get_item(
+            "fm4", "20200409", "4UP", "1586420063000-1586420268000"
+        )
+
+        self.assertEqual(
+            show,
+            {
+                "artist": "",
+                "id": "1586420063000-1586420264000",
+                "length": 205000,
+                "show_long": "Stay At Home, Baby!",
+                "time": "2020-04-09T10:14:23+02:00",
+                "title": "Joseph Gordon Levitts Platttform HitRecord",
+                "type": "B",
+            },
+        )
