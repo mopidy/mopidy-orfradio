@@ -18,6 +18,12 @@ Mopidy-ORFRadio
 stations <https://radiothek.orf.at/>`_.  It provides access to the live streams
 and the 7 day archive.
 
+Note that timestamps from the API are somewhat inaccurate (especially on
+non-music segments). This can cause a slight glitch between tracks, or in very
+few extreme cases the beginning getting cut off. The implementation avoids
+cutting off the end of tracks, with the trade off of sometimes appending a few
+seconds form the next to the previous.
+
 Installation
 ============
 
