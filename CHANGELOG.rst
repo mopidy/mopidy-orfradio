@@ -2,6 +2,15 @@
 Changelog
 *********
 
+
+v2.0.1 (2020-04-10)
+===================
+
+- Ö1: Add BJ archive-type, handle zero-item shows
+- Fix bug when catching up with live stream
+- Filter spurious Unicode control characters
+
+
 v2.0.0 (2020-04-01)
 ===================
 
