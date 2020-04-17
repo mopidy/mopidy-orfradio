@@ -3,7 +3,7 @@ Changelog
 *********
 
 
-v2.0.1 (2020-04-10)
+v2.0.1 (2020-04-17)
 ===================
 
 - Ö1: Add BJ archive-type, handle zero-item shows
