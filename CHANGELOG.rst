@@ -3,6 +3,12 @@ Changelog
 *********
 
 
+v2.0.2 (UNRELEASED)
+===================
+
+- Fix archive playback of Ö2 stations
+
+
 v2.0.1 (2020-04-17)
 ===================
 
