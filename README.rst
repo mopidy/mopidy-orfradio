@@ -76,7 +76,7 @@ Project resources
 
 - `Source code <https://github.com/mopidy/mopidy-orfradio>`_
 - `Issue tracker <https://github.com/mopidy/mopidy-orfradio/issues>`_
-- `Changelog <https://github.com/mopidy/mopidy-orfradio/blob/master/CHANGELOG.rst>`_
+- `Changelog <https://github.com/mopidy/mopidy-orfradio/releases>`_
 
 
 Credits
