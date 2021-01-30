@@ -37,7 +37,7 @@ class ORFClient:
     archive_uri = "http://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
     show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
-    live_uri = "https://%sshoutcast.sf.apa.at/;"
+    live_uri = "https://orf-live.ors-shoutcast.at/%s-q2a"
 
     def __init__(self, http_client=HttpClient(), backend=None):  # noqa: B008
         self.http_client = http_client
@@ -97,8 +97,8 @@ class ORFClient:
 
         return {"id": show_id, "label": show_rec["title"], "items": items}
 
-    def get_live_url(self, shoutcast_slug):
-        return ORFClient.live_uri % shoutcast_slug
+    def get_live_url(self, slug):
+        return ORFClient.live_uri % slug
 
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
