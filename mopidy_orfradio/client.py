@@ -65,6 +65,22 @@ class ORFClient:
 
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
+        # Sometimes the first item isn't at the beginning of the show, making
+        # part of it inaccessible. So we add a fake "zeroth" item when that
+        # happens:
+        first_item = next(iter(show_rec["items"]), None)
+        if first_item and show_rec["start"] < first_item["start"]:
+            show_rec["items"].insert(
+                0,
+                {
+                    "start": show_rec["start"],
+                    "startISO": show_rec["startISO"],
+                    "title": None,
+                    "duration": first_item["start"] - show_rec["start"],
+                    "type": "S",
+                },
+            )
+
         items = [
             {
                 "id": _generate_id(show_rec, i),

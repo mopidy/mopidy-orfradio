@@ -10,6 +10,7 @@ class HttpClientMock:
             "https://audioapi.orf.at/oe1/api/json/4.0/broadcast/594692/20200406": f"{thisdir}/broadcast594692.json",  # noqa: B950
             "https://audioapi.orf.at/fm4/api/json/4.0/broadcast/4UP/20200409": f"{thisdir}/broadcast1331137.json",  # noqa: B950
             "https://audioapi.orf.at/wie/api/json/4.0/broadcast/WXWOW/20200615": f"{thisdir}/broadcast20200615.json",  # noqa: B950
+            "https://audioapi.orf.at/oe1/api/json/4.0/broadcast/635031/20210412": f"{thisdir}/broadcast20210412.json",  # noqa: B950
         }
 
     def get(self, url):

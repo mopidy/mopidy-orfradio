@@ -69,6 +69,25 @@ class ORFClientTest(unittest.TestCase):
             },
         )
 
+    def test_get_show_zeroth_item(self):
+        self.orf_client.media_types += ["S"]
+        show = self.orf_client.get_show("oe1", "20210412", "635031")
+
+        self.assertEqual(
+            show["items"],
+            [
+                {
+                    "artist": "",
+                    "id": "1618203591000-1618203675000",
+                    "length": 84000,
+                    "show_long": "Ö1 Morgenjournal",
+                    "time": "2021-04-12T06:59:51+02:00",
+                    "title": "ohne Namen",
+                    "type": "S",
+                }
+            ],
+        )
+
     def test_get_item_broken_unicode(self):
         show = self.orf_client.get_item(
             "fm4", "20200409", "4UP", "1586420063000-1586420268000"
