@@ -178,9 +178,11 @@ def _generic_title(track):
     types = {
         "M": "Musik ",
         "B": "Beitrag ",
+        "BJ": "Journal ",
         "N": "Nachrichten ",
         "J": "Jingle ",  # (?)
         "W": "Werbung ",
+        # S (Sonstiges) omitted deliberately
     }
     return types.get(track["type"], "") + "ohne Namen"
 
