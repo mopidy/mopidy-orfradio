@@ -76,7 +76,6 @@ class ORFClient:
                     "start": show_rec["start"],
                     "startISO": show_rec["startISO"],
                     "title": None,
-                    "duration": first_item["start"] - show_rec["start"],
                     "type": "S",
                 },
             )
@@ -89,7 +88,7 @@ class ORFClient:
                 # Note: .interpreter can be absent or null. the following
                 # statement accounts for both:
                 "artist": track.get("interpreter") or "",
-                "length": track["duration"],
+                "length": _calculate_length(show_rec, i),
                 "show_long": show_rec["title"],
                 "type": track["type"],
             }
@@ -210,6 +209,16 @@ def _generate_id(show_rec, i):
         return f"{start}-{end}"
     else:
         return f"{start}"
+
+
+def _calculate_length(show_rec, i):
+    start = show_rec["items"][i]["start"]
+    end = (
+        show_rec["items"][i + 1]["start"]
+        if i + 1 < len(show_rec["items"])
+        else show_rec["end"]
+    )
+    return end - start
 
 
 def _mojibake(s):

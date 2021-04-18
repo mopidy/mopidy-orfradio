@@ -39,7 +39,7 @@ class ORFClientTest(unittest.TestCase):
                         "title": "Nachrichten",
                         "time": "2017-06-04T10:59:49+02:00",
                         "artist": "",
-                        "length": 12345,
+                        "length": 188000,
                         "show_long": "Nachrichten",
                         "type": "N",
                     }
@@ -98,7 +98,7 @@ class ORFClientTest(unittest.TestCase):
             {
                 "artist": "",
                 "id": "1586420063000-1586420264000",
-                "length": 205000,
+                "length": 201000,
                 "show_long": "Stay At Home, Baby!",
                 "time": "2020-04-09T10:14:23+02:00",
                 "title": "Joseph Gordon Levitts Platttform HitRecord",
