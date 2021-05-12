@@ -113,5 +113,5 @@ class ORFClientTest(unittest.TestCase):
 
         self.assertEqual(
             url,
-            "http://loopstream01.apa.at/?channel=oe2w&shoutcast=0&id=2020-06-15_1359_tl_61_7DaysMon7_289462.mp3&offset=0&offsetende=181000",  # noqa: B950
+            "https://loopstream01.apa.at/?channel=oe2w&shoutcast=0&id=2020-06-15_1359_tl_61_7DaysMon7_289462.mp3&offset=0&offsetende=181000",  # noqa: B950
         )

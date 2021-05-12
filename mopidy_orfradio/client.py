@@ -34,9 +34,9 @@ class HttpClient:
 
 
 class ORFClient:
-    archive_uri = "http://audioapi.orf.at/%s/json/2.0/broadcasts/"
+    archive_uri = "https://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
-    show_uri = "http://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
+    show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
     live_uri = "https://orf-live.ors-shoutcast.at/%s-q2a"
 
     def __init__(self, http_client=HttpClient(), backend=None):  # noqa: B008
