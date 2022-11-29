@@ -72,6 +72,7 @@ class ORFClient:
         # Sometimes the first item isn't at the beginning of the show, making
         # part of it inaccessible. So we add a fake "zeroth" item when that
         # happens:
+        show_date = _get_day_label(day_id)
         first_item = next(iter(show_rec["items"]), None)
         if first_item and show_rec["start"] < first_item["start"]:
             show_rec["items"].insert(
@@ -94,6 +95,7 @@ class ORFClient:
                 "artist": track.get("interpreter") or "",
                 "length": _calculate_length(show_rec, i),
                 "show_long": show_rec["title"],
+                "show_date": show_date,
                 "type": track["type"],
             }
             for i, track in enumerate(show_rec["items"])
@@ -110,6 +112,7 @@ class ORFClient:
                     "artist": show_rec.get("moderator") or "",
                     "length": show_rec["end"] - show_rec["start"],
                     "show_long": show_rec["title"],
+                    "show_date": show_date,
                     "type": "",
                 }
             ]
@@ -179,9 +182,10 @@ def _get_day_id(day_rec):
     return str(day_rec["day"])
 
 
-def _get_day_label(day_rec):
-    time = dateutil.parser.parse(day_rec["dateISO"])
-    return time.strftime("%a %d. %b %Y")
+def _get_day_label(day_id):
+    # The day id is a string in the form "YYYYMMDD".
+    date = datetime.datetime.strptime(day_id, "%Y%m%d")
+    return date.strftime("%a %Y-%m-%d")
 
 
 def _to_show(i, rec):

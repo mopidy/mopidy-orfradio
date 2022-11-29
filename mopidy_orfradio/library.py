@@ -188,7 +188,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
                 ),
                 artists=[Artist(name=item["artist"])],
                 length=item["length"],
-                album=Album(name=item["show_long"]),
+                album=Album(name=f"{item['show_long']} ({item['show_date']})"),
                 genre=item["type"],
                 name=item["title"],
             )

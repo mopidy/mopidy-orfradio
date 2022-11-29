@@ -31,6 +31,7 @@ class ORFClientTest(unittest.TestCase):
                     "artist": "",
                     "length": 188000,
                     "show_long": "Nachrichten",
+                    "show_date": "Sun 2017-06-04",
                     "type": "N",
                 }
             ],
@@ -49,6 +50,7 @@ class ORFClientTest(unittest.TestCase):
                     "artist": "Johannes Gelich",
                     "length": 1446000,
                     "show_long": "Radiokolleg - Wer ist Opfer?",
+                    "show_date": "Mon 2020-04-06",
                     "type": "",
                 }
             ],
@@ -66,6 +68,7 @@ class ORFClientTest(unittest.TestCase):
                     "id": "1618203591000-1618203675000",
                     "length": 84000,
                     "show_long": "Ö1 Morgenjournal",
+                    "show_date": "Mon 2021-04-12",
                     "time": "2021-04-12T06:59:51+02:00",
                     "title": "ohne Namen",
                     "type": "S",
@@ -85,6 +88,7 @@ class ORFClientTest(unittest.TestCase):
                 "id": "1586420063000-1586420264000",
                 "length": 201000,
                 "show_long": "Stay At Home, Baby!",
+                "show_date": "Thu 2020-04-09",
                 "time": "2020-04-09T10:14:23+02:00",
                 "title": "Joseph Gordon Levitts Platttform HitRecord",
                 "type": "B",
