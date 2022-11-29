@@ -48,6 +48,8 @@ class ORFClient:
 
     def get_day(self, station, day_id):
         day_rec = self._get_day_json(station, day_id)
+        if not day_rec:
+            return []
 
         def now(offset):
             return datetime.datetime.now(
@@ -65,6 +67,8 @@ class ORFClient:
 
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
+        if not show_rec:
+            return []
         # Sometimes the first item isn't at the beginning of the show, making
         # part of it inaccessible. So we add a fake "zeroth" item when that
         # happens:
@@ -125,6 +129,8 @@ class ORFClient:
 
     def get_item_url(self, station, shoutcast, day_id, show_id, item_id):
         json = self._get_record_json(station, show_id, day_id)
+        if not json:
+            return None
 
         streams = json["streams"]
         if len(streams) == 0:
@@ -163,7 +169,7 @@ class ORFClient:
 
     def _get_day_json(self, station, day_id):
         json = self._get_archive_json(station)
-        return next(rec for rec in json if _get_day_id(rec) == day_id)
+        return next((rec for rec in json if _get_day_id(rec) == day_id), None)
 
     def _get_record_json(self, station, programKey, day):
         return self._get_json(ORFClient.record_uri % (station, programKey, day))
