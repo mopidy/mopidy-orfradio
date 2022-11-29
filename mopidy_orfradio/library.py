@@ -105,7 +105,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
     def _get_track_title(self, item, afterhours=False):
         time = item["time"]
         if afterhours and self.backend.config["orfradio"]["afterhours"]:
-            time = re.sub(r"^0([0-5]:)", r"O\1", time)
+            time = re.sub(r"^0([0-4]:)", r"O\1", time)
         return "{}: {}".format(time, item["title"])
 
     def _browse_day(self, station, day_id):
