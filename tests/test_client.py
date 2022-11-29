@@ -12,17 +12,10 @@ class ORFClientTest(unittest.TestCase):
 
     def test_get_day(self):
         day = self.orf_client.get_day("oe1", "20170604")
-        day["shows"] = day["shows"][:1]  # only test against first show
+        day = day[:1]  # only test against first show
 
         self.assertEqual(
-            day,
-            {
-                "id": "20170604",
-                "label": "Sun 04. Jun 2017",
-                "shows": [
-                    {"id": "475617", "title": "Nachrichten", "time": "10:59"}
-                ],
-            },
+            day, [{"id": "475617", "title": "Nachrichten", "time": "10:59"}]
         )
 
     def test_get_show(self):
@@ -30,21 +23,17 @@ class ORFClientTest(unittest.TestCase):
 
         self.assertEqual(
             show,
-            {
-                "id": "475617",
-                "label": "Nachrichten",
-                "items": [
-                    {
-                        "id": "1496566789000",
-                        "title": "Nachrichten",
-                        "time": "2017-06-04T10:59:49+02:00",
-                        "artist": "",
-                        "length": 188000,
-                        "show_long": "Nachrichten",
-                        "type": "N",
-                    }
-                ],
-            },
+            [
+                {
+                    "id": "1496566789000",
+                    "title": "Nachrichten",
+                    "time": "2017-06-04T10:59:49+02:00",
+                    "artist": "",
+                    "length": 188000,
+                    "show_long": "Nachrichten",
+                    "type": "N",
+                }
+            ],
         )
 
     def test_get_show_no_subitems(self):
@@ -52,21 +41,17 @@ class ORFClientTest(unittest.TestCase):
 
         self.assertEqual(
             show,
-            {
-                "id": "594692",
-                "label": "Radiokolleg - Wer ist Opfer?",
-                "items": [
-                    {
-                        "id": "1586156702000",
-                        "title": "Radiokolleg - Wer ist Opfer?",
-                        "time": "2020-04-06T09:05:02+02:00",
-                        "artist": "Johannes Gelich",
-                        "length": 1446000,
-                        "show_long": "Radiokolleg - Wer ist Opfer?",
-                        "type": "",
-                    }
-                ],
-            },
+            [
+                {
+                    "id": "1586156702000",
+                    "title": "Radiokolleg - Wer ist Opfer?",
+                    "time": "2020-04-06T09:05:02+02:00",
+                    "artist": "Johannes Gelich",
+                    "length": 1446000,
+                    "show_long": "Radiokolleg - Wer ist Opfer?",
+                    "type": "",
+                }
+            ],
         )
 
     def test_get_show_zeroth_item(self):
@@ -74,7 +59,7 @@ class ORFClientTest(unittest.TestCase):
         show = self.orf_client.get_show("oe1", "20210412", "635031")
 
         self.assertEqual(
-            show["items"],
+            show,
             [
                 {
                     "artist": "",

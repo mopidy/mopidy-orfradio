@@ -68,22 +68,18 @@ class ORFLibraryProviderTest(unittest.TestCase):
     def setUp(self):
         self.client_mock = Mock()
         self.client_mock.get_day = Mock(
-            return_value={
-                "shows": [
-                    {"id": "1", "time": "01:00", "title": "Item1"},
-                    {"id": "2", "time": "02:00", "title": "Item2"},
-                    {"id": "3", "time": "03:00", "title": "Item3"},
-                ]
-            }
+            return_value=[
+                {"id": "1", "time": "01:00", "title": "Item1"},
+                {"id": "2", "time": "02:00", "title": "Item2"},
+                {"id": "3", "time": "03:00", "title": "Item3"},
+            ]
         )
         self.client_mock.get_show = Mock(
-            return_value={
-                "items": [
-                    {"id": "1", "time": "01:00", "title": "Item1"},
-                    {"id": "2", "time": "02:00", "title": "Item2"},
-                    {"id": "3", "time": "03:00", "title": "Item3"},
-                ]
-            }
+            return_value=[
+                {"id": "1", "time": "01:00", "title": "Item1"},
+                {"id": "2", "time": "02:00", "title": "Item2"},
+                {"id": "3", "time": "03:00", "title": "Item3"},
+            ]
         )
         self.client_mock.get_item = Mock(
             return_value={"id": "1", "time": "01:00", "title": "Item1"}

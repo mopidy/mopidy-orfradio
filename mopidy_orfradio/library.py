@@ -118,7 +118,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
                 ),
                 name=self._get_track_title(show, afterhours=True),
             )
-            for show in self.client.get_day(station, day_id)["shows"]
+            for show in self.client.get_day(station, day_id)
         ]
 
     def _browse_show(self, station, day_id, show_id):
@@ -135,7 +135,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
                 ),
                 name=self._get_track_title(item),
             )
-            for item in self.client.get_show(station, day_id, show_id)["items"]
+            for item in self.client.get_show(station, day_id, show_id)
         ]
 
     def lookup(self, uri):

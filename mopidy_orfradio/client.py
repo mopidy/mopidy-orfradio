@@ -61,7 +61,7 @@ class ORFClient:
             < now(broadcast_rec["endOffset"])
         ]
 
-        return {"id": day_id, "label": _get_day_label(day_rec), "shows": shows}
+        return shows
 
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
@@ -110,7 +110,7 @@ class ORFClient:
                 }
             ]
 
-        return {"id": show_id, "label": show_rec["title"], "items": items}
+        return items
 
     def get_live_url(self, slug):
         return ORFClient.live_uri % slug
@@ -119,7 +119,7 @@ class ORFClient:
         show = self.get_show(station, day_id, show_id)
         return next(
             item
-            for item in show["items"]
+            for item in show
             if item["id"].split("-")[0] == item_id.split("-")[0]
         )
 
