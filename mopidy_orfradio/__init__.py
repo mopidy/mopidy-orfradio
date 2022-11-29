@@ -24,6 +24,7 @@ class Extension(ext.Extension):
         schema["stations"] = config.List()
         schema["afterhours"] = config.Boolean()
         schema["archive_types"] = config.List()
+        schema["livestream_bitrate"] = config.Integer(choices=[128, 192])
         return schema
 
     def setup(self, registry):

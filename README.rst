@@ -70,6 +70,12 @@ Mopidy-ORFRadio to your Mopidy configuration file::
         BJ
         N
 
+    # Live stream is available as 128 or 192 kbit/s. The archive always plays
+    # at 192 kbit/s.
+    #
+    # Default:
+    livestream_bitrate = 192
+
 
 Project resources
 =================

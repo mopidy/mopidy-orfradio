@@ -37,14 +37,22 @@ class ORFClient:
     archive_uri = "https://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
     show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
-    live_uri = "https://orf-live.ors-shoutcast.at/%s-q2a"
+    live_uri = "https://orf-live.ors-shoutcast.at/%s-%s"
+
+    bitrates = {
+        128: "q1a",
+        192: "q2a",
+    }
 
     def __init__(self, http_client=HttpClient(), backend=None):  # noqa: B008
         self.http_client = http_client
         if backend:
             self.media_types = backend.config["orfradio"]["archive_types"]
+            selected_bitrate = backend.config["orfradio"]["livestream_bitrate"]
+            self.live_bitrate = self.bitrates[selected_bitrate]
         else:
             self.media_types = ["M", "B", "N"]
+            self.live_bitrate = "q2a"
 
     def get_day(self, station, day_id):
         day_rec = self._get_day_json(station, day_id)
@@ -120,7 +128,7 @@ class ORFClient:
         return items
 
     def get_live_url(self, slug):
-        return ORFClient.live_uri % slug
+        return ORFClient.live_uri % (slug, self.live_bitrate)
 
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
