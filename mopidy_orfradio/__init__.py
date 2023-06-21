@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class Extension(ext.Extension):
-
     dist_name = "Mopidy-ORFRadio"
     ext_name = "orfradio"
     version = __version__

@@ -6,7 +6,7 @@ Mopidy-ORFRadio
     :target: https://pypi.org/project/Mopidy-ORFRadio/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/github/workflow/status/mopidy/mopidy-orfradio/CI
+.. image:: https://img.shields.io/github/actions/workflow/status/mopidy/mopidy-orfradio/ci.yml?branch=main
     :target: https://github.com/mopidy/mopidy-orfradio/actions
     :alt: CI build status
 
