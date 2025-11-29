@@ -18,7 +18,7 @@ class ORFUris:
         "oe1": "Ö1",
         "oe3": "Ö3",
         "fm4": "FM4",
-        "campus": "Ö1 Campus",  # note: has no archive
+        "campus": "Ö1 Campus",
         "bgl": "Radio Burgenland",
         "ktn": "Radio Kärnten",
         "noe": "Radio Niederösterreich",
@@ -28,7 +28,9 @@ class ORFUris:
         "tir": "Radio Tirol",
         "vbg": "Radio Vorarlberg",
         "wie": "Radio Wien",
+        "slo": "ORF Slovenski spored",
     }
+    no_archive = ("campus", "slo")
 
 
 class ORFLibraryProvider(backend.LibraryProvider):
@@ -95,7 +97,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
             for day in last_week
         ]
 
-        if station == "campus":
+        if station in ORFUris.no_archive:
             return [live]
         return [live] + archive
 

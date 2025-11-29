@@ -58,6 +58,7 @@ Mopidy-ORFRadio to your Mopidy configuration file::
         stm
         tir
         vbg
+        slo
 
     # Remove from list to automatically skip tracks of the type.
     #
