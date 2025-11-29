@@ -15,7 +15,7 @@ Mopidy-ORFRadio
     :alt: Test coverage
 
 `Mopidy <http://www.mopidy.com/>`_ extension to access the `Austrian ORF radio
-stations <https://radiothek.orf.at/>`_.  It provides access to the live streams
+stations <https://sound.orf.at/>`_.  It provides access to the live streams
 and the 7 day archive.
 
 Note that timestamps from the API are somewhat inaccurate (especially on
