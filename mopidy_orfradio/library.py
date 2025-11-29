@@ -13,22 +13,22 @@ logger = logging.getLogger(__name__)
 
 class ORFUris:
     ROOT = "orfradio"
-    stations = [
+    stations = {
         # name, audioapi_slug
-        ("Ö1", "oe1"),
-        ("Ö3", "oe3"),
-        ("FM4", "fm4"),
-        ("Ö1 Campus", "campus"),  # note: has no archive
-        ("Radio Burgenland", "bgl"),
-        ("Radio Kärnten", "ktn"),
-        ("Radio Niederösterreich", "noe"),
-        ("Radio Oberösterreich", "ooe"),
-        ("Radio Salzburg", "sbg"),
-        ("Radio Steiermark", "stm"),
-        ("Radio Tirol", "tir"),
-        ("Radio Vorarlberg", "vbg"),
-        ("Radio Wien", "wie"),
-    ]
+        "oe1": "Ö1",
+        "oe3": "Ö3",
+        "fm4": "FM4",
+        "campus": "Ö1 Campus",  # note: has no archive
+        "bgl": "Radio Burgenland",
+        "ktn": "Radio Kärnten",
+        "noe": "Radio Niederösterreich",
+        "ooe": "Radio Oberösterreich",
+        "sbg": "Radio Salzburg",
+        "stm": "Radio Steiermark",
+        "tir": "Radio Tirol",
+        "vbg": "Radio Vorarlberg",
+        "wie": "Radio Wien",
+    }
 
 
 class ORFLibraryProvider(backend.LibraryProvider):
@@ -39,7 +39,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         self.client = client or ORFClient(backend=self.backend)
         self.root = [
             Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
-            for name, slug in ORFUris.stations
+            for slug, name in ORFUris.stations.items()
             if slug in self.backend.config["orfradio"]["stations"]
         ]
 
@@ -71,15 +71,12 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return []
 
     def _browse_station(self, station):
-        try:
-            name = next(
-                name for name, slug in ORFUris.stations if slug == station
-            )
-        except StopIteration:
+        if not station in ORFUris.stations:
             return []
+
         live = Ref.track(
             uri=str(ORFLibraryUri(ORFUriType.LIVE, station)),
-            name=f"{name} Live",
+            name=f"{ORFUris.stations[station]} Live",
         )
 
         last_week = [
