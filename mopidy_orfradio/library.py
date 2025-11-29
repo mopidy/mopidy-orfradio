@@ -73,7 +73,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return []
 
     def _browse_station(self, station):
-        if not station in ORFUris.stations:
+        if station not in ORFUris.stations:
             return []
 
         live = Ref.track(
