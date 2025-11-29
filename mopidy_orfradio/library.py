@@ -14,20 +14,20 @@ logger = logging.getLogger(__name__)
 class ORFUris:
     ROOT = "orfradio"
     stations = [
-        # name, audioapi_slug, shoutcast_slug
-        ("Ö1", "oe1", "oe1"),
-        ("Ö3", "oe3", "oe3"),
-        ("FM4", "fm4", "fm4"),
-        ("Ö1 Campus", "campus", "oe1campus"),  # note: has no archive
-        ("Radio Burgenland", "bgl", "oe2b"),
-        ("Radio Kärnten", "ktn", "oe2k"),
-        ("Radio Niederösterreich", "noe", "oe2n"),
-        ("Radio Oberösterreich", "ooe", "oe2o"),
-        ("Radio Salzburg", "sbg", "oe2s"),
-        ("Radio Steiermark", "stm", "oe2st"),
-        ("Radio Tirol", "tir", "oe2t"),
-        ("Radio Vorarlberg", "vbg", "oe2v"),
-        ("Radio Wien", "wie", "oe2w"),
+        # name, audioapi_slug
+        ("Ö1", "oe1"),
+        ("Ö3", "oe3"),
+        ("FM4", "fm4"),
+        ("Ö1 Campus", "campus"),  # note: has no archive
+        ("Radio Burgenland", "bgl"),
+        ("Radio Kärnten", "ktn"),
+        ("Radio Niederösterreich", "noe"),
+        ("Radio Oberösterreich", "ooe"),
+        ("Radio Salzburg", "sbg"),
+        ("Radio Steiermark", "stm"),
+        ("Radio Tirol", "tir"),
+        ("Radio Vorarlberg", "vbg"),
+        ("Radio Wien", "wie"),
     ]
 
 
@@ -39,7 +39,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         self.client = client or ORFClient(backend=self.backend)
         self.root = [
             Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
-            for (name, slug, _) in ORFUris.stations
+            for name, slug in ORFUris.stations
             if slug in self.backend.config["orfradio"]["stations"]
         ]
 
@@ -73,7 +73,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
     def _browse_station(self, station):
         try:
             name = next(
-                name for (name, slug, _) in ORFUris.stations if slug == station
+                name for name, slug in ORFUris.stations if slug == station
             )
         except StopIteration:
             return []
@@ -236,14 +236,6 @@ class ORFLibraryUri:
             return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
         raise InvalidORFUri(uri)
-
-    @property
-    def shoutcast(self):
-        return next(
-            shoutcast
-            for (_, slug, shoutcast) in ORFUris.stations
-            if slug == self.station
-        )
 
     def __str__(self):
         if self.uri_type == ORFUriType.ROOT:

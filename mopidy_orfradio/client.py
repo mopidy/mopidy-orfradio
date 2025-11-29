@@ -138,7 +138,7 @@ class ORFClient:
             if item["id"].split("-")[0] == item_id.split("-")[0]
         )
 
-    def get_item_url(self, station, shoutcast, day_id, show_id, item_id):
+    def get_item_url(self, station, day_id, show_id, item_id):
         json = self._get_record_json(station, show_id, day_id)
         if not json:
             return None
@@ -157,7 +157,7 @@ class ORFClient:
         offsetstart = int(item_start) - stream["start"]
         offsetende = int(item_end) - stream["start"] if item_end else ""
         return ORFClient.show_uri % (
-            shoutcast,
+            station,
             streamId,
             offsetstart,
             offsetende,
