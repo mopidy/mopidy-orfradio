@@ -97,10 +97,10 @@ class ORFClientTest(unittest.TestCase):
 
     def test_get_item_url_oe2(self):
         url = self.orf_client.get_item_url(
-            "wie", "oe2w", "20200615", "WXWOW", "1592222374000-1592222555000"
+            "wie", "20200615", "WXWOW", "1592222374000-1592222555000"
         )
 
         self.assertEqual(
             url,
-            "https://loopstream01.apa.at/?channel=oe2w&shoutcast=0&id=2020-06-15_1359_tl_61_7DaysMon7_289462.mp3&offset=0&offsetende=181000",  # noqa: B950
+            "https://loopstream01.apa.at/?channel=wie&shoutcast=0&id=2020-06-15_1359_tl_61_7DaysMon7_289462.mp3&offset=0&offsetende=181000",  # noqa: B950
         )
