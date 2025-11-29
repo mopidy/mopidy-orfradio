@@ -14,23 +14,22 @@ logger = logging.getLogger(__name__)
 class ORFUris:
     ROOT = "orfradio"
     stations = {
-        # name, audioapi_slug
-        "oe1": "Ö1",
-        "oe3": "Ö3",
-        "fm4": "FM4",
-        "campus": "Ö1 Campus",
-        "bgl": "Radio Burgenland",
-        "ktn": "Radio Kärnten",
-        "noe": "Radio Niederösterreich",
-        "ooe": "Radio Oberösterreich",
-        "sbg": "Radio Salzburg",
-        "stm": "Radio Steiermark",
-        "tir": "Radio Tirol",
-        "vbg": "Radio Vorarlberg",
-        "wie": "Radio Wien",
-        "slo": "ORF Slovenski spored",
+        # audioapi_slug: (name, loopstream_slug)
+        "oe1": ("Ö1", "oe1"),
+        "oe3": ("Ö3", "oe3"),
+        "fm4": ("FM4", "fm4"),
+        "campus": ("Ö1 Campus", None),
+        "bgl": ("Radio Burgenland", "oe2b"),
+        "ktn": ("Radio Kärnten", "oe2k"),
+        "noe": ("Radio Niederösterreich", "oe2n"),
+        "ooe": ("Radio Oberösterreich", "oe2o"),
+        "sbg": ("Radio Salzburg", "oe2s"),
+        "stm": ("Radio Steiermark", "oe2st"),
+        "tir": ("Radio Tirol", "oe2t"),
+        "vbg": ("Radio Vorarlberg", "oe2v"),
+        "wie": ("Radio Wien", "oe2w"),
+        "slo": ("ORF Slovenski spored", None),
     }
-    no_archive = ("campus", "slo")
 
 
 class ORFLibraryProvider(backend.LibraryProvider):
@@ -41,7 +40,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         self.client = client or ORFClient(backend=self.backend)
         self.root = [
             Ref.directory(uri=f"{ORFUris.ROOT}:{slug}", name=name)
-            for slug, name in ORFUris.stations.items()
+            for slug, (name, _) in ORFUris.stations.items()
             if slug in self.backend.config["orfradio"]["stations"]
         ]
 
@@ -76,9 +75,10 @@ class ORFLibraryProvider(backend.LibraryProvider):
         if station not in ORFUris.stations:
             return []
 
+        name, loopstream_slug = ORFUris.stations[station]
         live = Ref.track(
             uri=str(ORFLibraryUri(ORFUriType.LIVE, station)),
-            name=f"{ORFUris.stations[station]} Live",
+            name=f"{name} Live",
         )
 
         last_week = [
@@ -97,7 +97,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
             for day in last_week
         ]
 
-        if station in ORFUris.no_archive:
+        if loopstream_slug is None:
             return [live]
         return [live] + archive
 
@@ -235,6 +235,11 @@ class ORFLibraryUri:
             return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
         raise InvalidORFUri(uri)
+
+    @property
+    def loopstream(self):
+        name, loopstream_slug = ORFUris.stations[self.station]
+        return loopstream_slug
 
     def __str__(self):
         if self.uri_type == ORFUriType.ROOT:
