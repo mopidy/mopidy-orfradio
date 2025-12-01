@@ -1,8 +1,7 @@
 import logging
 
-from mopidy import backend
-
 import pykka
+from mopidy import backend
 
 from mopidy_orfradio.library import ORFLibraryProvider
 from mopidy_orfradio.playback import ORFPlaybackProvider

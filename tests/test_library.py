@@ -1,6 +1,5 @@
-import unittest
 import datetime
-
+import unittest
 from unittest.mock import Mock
 
 from mopidy.models import Ref

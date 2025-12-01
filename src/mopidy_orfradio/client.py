@@ -1,14 +1,12 @@
+import datetime
+import json
 import logging
+import re
 import urllib
 
+import dateutil.parser
 from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
-
-import dateutil.parser
-import datetime
-
-import json
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +34,7 @@ class HttpClient:
 class ORFClient:
     archive_uri = "https://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
-    show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
+    show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"
     live_uri = "https://orf-live.ors-shoutcast.at/%s-%s"
 
     bitrates = {
@@ -219,8 +217,7 @@ def _generate_id(show_rec, i):
     if i + 1 < len(show_rec["items"]):
         end = show_rec["items"][i + 1]["start"]
         return f"{start}-{end}"
-    else:
-        return f"{start}"
+    return f"{start}"
 
 
 def _calculate_length(show_rec, i):

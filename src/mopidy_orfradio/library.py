@@ -1,10 +1,10 @@
+import datetime
 import logging
 import re
 import urllib
-import datetime
 
 from mopidy import backend
-from mopidy.models import Ref, Track, Artist, Album
+from mopidy.models import Album, Artist, Ref, Track
 
 from .client import ORFClient
 
@@ -219,18 +219,17 @@ class ORFLibraryUri:
             return ORFLibraryUri(ORFUriType.ROOT)
         if live_or_day is None:
             return ORFLibraryUri(ORFUriType.STATION, station)
-        elif live_or_day == "live":
+        if live_or_day == "live":
             return ORFLibraryUri(ORFUriType.LIVE, station)
-        else:
-            if item:
-                return ORFLibraryUri(
-                    ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item
-                )
-            if show:
-                return ORFLibraryUri(
-                    ORFUriType.ARCHIVE_SHOW, station, live_or_day, show
-                )
-            return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
+        if item:
+            return ORFLibraryUri(
+                ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item
+            )
+        if show:
+            return ORFLibraryUri(
+                ORFUriType.ARCHIVE_SHOW, station, live_or_day, show
+            )
+        return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
         raise InvalidORFUri(uri)
 
@@ -251,7 +250,7 @@ class ORFLibraryUri:
         if self.uri_type == ORFUriType.ARCHIVE_SHOW:
             return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}"
         if self.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}"  # noqa: B950
+            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}"
 
 
 class InvalidORFUri(TypeError):
