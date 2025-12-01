@@ -111,9 +111,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return [
             Ref.directory(
                 uri=str(
-                    ORFLibraryUri(
-                        ORFUriType.ARCHIVE_SHOW, station, day_id, show["id"]
-                    )
+                    ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, day_id, show["id"])
                 ),
                 name=self._get_track_title(show, afterhours=True),
             )

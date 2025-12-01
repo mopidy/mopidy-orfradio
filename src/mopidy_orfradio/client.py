@@ -133,9 +133,7 @@ class ORFClient:
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
         return next(
-            item
-            for item in show
-            if item["id"].split("-")[0] == item_id.split("-")[0]
+            item for item in show if item["id"].split("-")[0] == item_id.split("-")[0]
         )
 
     def get_item_url(self, station, loopstream_slug, day_id, show_id, item_id):
@@ -149,9 +147,7 @@ class ORFClient:
 
         item_start, item_end, *_ = item_id.split("-", 1) + 1 * [None]
         stream = next(
-            stream
-            for stream in reversed(streams)
-            if stream["start"] <= int(item_start)
+            stream for stream in reversed(streams) if stream["start"] <= int(item_start)
         )
         streamId = stream["loopStreamId"]
         offsetstart = int(item_start) - stream["start"]
@@ -171,9 +167,7 @@ class ORFClient:
             content = self.http_client.get(uri)
             return json.loads(content)
         except Exception as e:
-            logger.error(
-                "Error decoding content received from '%s': %s", uri, e
-            )
+            logger.error("Error decoding content received from '%s': %s", uri, e)
 
     def _get_archive_json(self, station):
         return self._get_json(ORFClient.archive_uri % station)
