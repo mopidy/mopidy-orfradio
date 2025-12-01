@@ -1,22 +1,18 @@
-import logging
-import os
+import pathlib
+from importlib.metadata import version
 
 from mopidy import config, ext
 
-
-__version__ = "2.0.0"
-
-logger = logging.getLogger(__name__)
+__version__ = version("mopidy-orfradio")
 
 
 class Extension(ext.Extension):
-    dist_name = "Mopidy-ORFRadio"
+    dist_name = "mopidy-orfradio"
     ext_name = "orfradio"
     version = __version__
 
     def get_default_config(self):
-        conf_file = os.path.join(os.path.dirname(__file__), "ext.conf")
-        return config.read(conf_file)
+        return config.read(pathlib.Path(__file__).parent / "ext.conf")
 
     def get_config_schema(self):
         schema = super().get_config_schema()
@@ -27,6 +23,6 @@ class Extension(ext.Extension):
         return schema
 
     def setup(self, registry):
-        from .backend import ORFBackend
+        from mopidy_orfradio.backend import ORFBackend  # noqa: PLC0415
 
         registry.add("backend", ORFBackend)
