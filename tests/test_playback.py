@@ -20,7 +20,7 @@ class ORFLibraryUriTest(unittest.TestCase):
 
         result = playback.translate_uri(str(library_uri))
 
-        self.assertEqual(result, "result_uri")
+        assert result == "result_uri"
 
     def test_playback_live(self):
         library_uri = ORFLibraryUri(ORFUriType.LIVE, "oe1")
@@ -31,7 +31,7 @@ class ORFLibraryUriTest(unittest.TestCase):
 
         result = playback.translate_uri(str(library_uri))
 
-        self.assertEqual(result, "result_uri")
+        assert result == "result_uri"
 
     def test_playback_invalid_url(self):
         audio_mock = Mock()
@@ -40,7 +40,7 @@ class ORFLibraryUriTest(unittest.TestCase):
         playback = ORFPlaybackProvider(audio_mock, None, client=None)
         result = playback.translate_uri("invalid")
 
-        self.assertIsNone(result)
+        assert result is None
 
     def test_playback_unplayable_url(self):
         library_uri = ORFLibraryUri(ORFUriType.STATION, "oe1")
@@ -48,4 +48,4 @@ class ORFLibraryUriTest(unittest.TestCase):
 
         result = playback.translate_uri(str(library_uri))
 
-        self.assertIsNone(result)
+        assert result is None
