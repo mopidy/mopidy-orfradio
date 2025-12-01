@@ -1,0 +1,9 @@
+_commit: v1.1.0
+_src_path: gh:mopidy/mopidy-ext-template
+author_email: girst@users.noreply.github.com
+author_full_name: Tobias Girstmair
+repo_name: mopidy-orfradio
+dist_name: Mopidy-ORFRadio
+ext_name: orfradio
+github_username: mopidy
+short_description: Mopidy extension to access the Austrian ORF radio stations
