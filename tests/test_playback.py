@@ -1,11 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from mopidy_orfradio.playback import (
-    ORFLibraryUri,
-    ORFPlaybackProvider,
-    ORFUriType,
-)
+from mopidy_orfradio.playback import ORFLibraryUri, ORFPlaybackProvider, ORFUriType
 
 
 class ORFLibraryUriTest(unittest.TestCase):

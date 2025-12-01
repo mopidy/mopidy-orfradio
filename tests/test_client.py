@@ -1,13 +1,41 @@
 import unittest
+from pathlib import Path
 
 from mopidy_orfradio.client import ORFClient
 
-from . import utils
+DATA_DIR = Path(__file__).parent / "data"
+
+
+class HttpClientMock:
+    def __init__(self):
+        self.url_mappings = {
+            "https://audioapi.orf.at/oe1/json/2.0/broadcasts/": (
+                DATA_DIR / "broadcasts.json"
+            ),
+            "https://audioapi.orf.at/oe1/api/json/4.0/broadcast/475617/20170604": (
+                DATA_DIR / "broadcast475617.json"
+            ),
+            "https://audioapi.orf.at/oe1/api/json/4.0/broadcast/594692/20200406": (
+                DATA_DIR / "broadcast594692.json"
+            ),
+            "https://audioapi.orf.at/fm4/api/json/4.0/broadcast/4UP/20200409": (
+                DATA_DIR / "broadcast1331137.json"
+            ),
+            "https://audioapi.orf.at/wie/api/json/4.0/broadcast/WXWOW/20200615": (
+                DATA_DIR / "broadcast20200615.json"
+            ),
+            "https://audioapi.orf.at/oe1/api/json/4.0/broadcast/635031/20210412": (
+                DATA_DIR / "broadcast20210412.json"
+            ),
+        }
+
+    def get(self, url):
+        return self.url_mappings[url].read_text()
 
 
 class ORFClientTest(unittest.TestCase):
     def setUp(self):
-        self.http_client_mock = utils.HttpClientMock()
+        self.http_client_mock = HttpClientMock()
         self.orf_client = ORFClient(self.http_client_mock)
 
     def test_get_day(self):

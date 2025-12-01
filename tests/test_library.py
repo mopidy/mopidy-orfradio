@@ -1,14 +1,11 @@
-import datetime
+import datetime as dt
 import unittest
 from unittest.mock import Mock
 
 from mopidy.models import Ref
 
-from mopidy_orfradio.library import (
-    ORFLibraryProvider,
-    ORFLibraryUri,
-    ORFUriType,
-)
+from mopidy_orfradio import TZ
+from mopidy_orfradio.library import ORFLibraryProvider, ORFLibraryUri, ORFUriType
 
 
 class ORFLibraryUriTest(unittest.TestCase):
@@ -111,9 +108,9 @@ class ORFLibraryProviderTest(unittest.TestCase):
         assert result[0].uri == "orfradio:oe1/live"
         assert result[0].name == "Ö1 Live"
         assert result[1].type == Ref.DIRECTORY
-        today = datetime.datetime.today().strftime("%Y%m%d")
+        today = dt.datetime.now(tz=TZ).strftime("%Y%m%d")
         assert result[1].uri == f"orfradio:oe1/{today}"
-        labeltext = datetime.datetime.today().strftime("%Y-%m-%d %A")
+        labeltext = dt.datetime.now(tz=TZ).strftime("%Y-%m-%d %A")
         assert result[1].name == labeltext
 
     def test_browse_archive_day(self):
