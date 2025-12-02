@@ -1,20 +1,26 @@
+from __future__ import annotations
+
+import datetime
 import logging
 import re
 import urllib
-import datetime
+from enum import IntEnum
+from typing import ClassVar, override
 
 from mopidy import backend
-from mopidy.models import Ref, Track, Artist, Album
+from mopidy.models import Album, Artist, Ref, Track
 
-from .client import ORFClient
+from mopidy_orfradio import TZ
+from mopidy_orfradio.client import ORFClient
 
 logger = logging.getLogger(__name__)
 
 
 class ORFUris:
     ROOT = "orfradio"
-    stations = {
-        # audioapi_slug: (name, loopstream_slug)
+
+    # Mapping from audioapi_slug to (name, loopstream_slug)
+    stations: ClassVar[dict[str, tuple[str, str | None]]] = {
         "oe1": ("Ö1", "oe1"),
         "oe3": ("Ö3", "oe3"),
         "fm4": ("FM4", "fm4"),
@@ -44,32 +50,31 @@ class ORFLibraryProvider(backend.LibraryProvider):
             if slug in self.backend.config["orfradio"]["stations"]
         ]
 
+    @override
     def browse(self, uri):
         try:
             library_uri = ORFLibraryUri.parse(uri)
-        except InvalidORFUri as e:
-            logger.error(e)
+        except InvalidORFUriError as e:
+            logger.error(e)  # noqa: TRY400
             return []
 
-        if library_uri.uri_type == ORFUriType.ROOT:
-            return self.root
-
-        if library_uri.uri_type == ORFUriType.STATION:
-            return self._browse_station(library_uri.station)
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE_DAY:
-            return self._browse_day(library_uri.station, library_uri.day_id)
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE_SHOW:
-            return self._browse_show(
-                library_uri.station, library_uri.day_id, library_uri.show_id
-            )
-
-        logger.warning(
-            "ORFLibraryProvider.browse called with uri "
-            "that does not support browsing: '%s'." % uri
-        )
-        return []
+        match library_uri.uri_type:
+            case ORFUriType.ROOT:
+                return self.root
+            case ORFUriType.STATION:
+                return self._browse_station(library_uri.station)
+            case ORFUriType.ARCHIVE_DAY:
+                return self._browse_day(library_uri.station, library_uri.day_id)
+            case ORFUriType.ARCHIVE_SHOW:
+                return self._browse_show(
+                    library_uri.station, library_uri.day_id, library_uri.show_id
+                )
+            case ORFUriType.LIVE | ORFUriType.ARCHIVE_ITEM:
+                logger.warning(
+                    "ORFLibraryProvider.browse called with URI "
+                    f"that does not support browsing: {uri!r}"
+                )
+                return []
 
     def _browse_station(self, station):
         if station not in ORFUris.stations:
@@ -82,7 +87,9 @@ class ORFLibraryProvider(backend.LibraryProvider):
         )
 
         last_week = [
-            datetime.date.fromordinal(datetime.datetime.today().toordinal() - d)
+            datetime.date.fromordinal(
+                datetime.datetime.now(tz=TZ).date().toordinal() - d
+            )
             for d in range(8)
         ]
         archive = [
@@ -99,9 +106,9 @@ class ORFLibraryProvider(backend.LibraryProvider):
 
         if loopstream_slug is None:
             return [live]
-        return [live] + archive
+        return [live, *archive]
 
-    def _get_track_title(self, item, afterhours=False):
+    def _get_track_title(self, item, *, afterhours=False):
         time = item["time"]
         if afterhours and self.backend.config["orfradio"]["afterhours"]:
             time = re.sub(r"^0([0-4]:)", r"O\1", time)
@@ -111,9 +118,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
         return [
             Ref.directory(
                 uri=str(
-                    ORFLibraryUri(
-                        ORFUriType.ARCHIVE_SHOW, station, day_id, show["id"]
-                    )
+                    ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, day_id, show["id"])
                 ),
                 name=self._get_track_title(show, afterhours=True),
             )
@@ -137,40 +142,38 @@ class ORFLibraryProvider(backend.LibraryProvider):
             for item in self.client.get_show(station, day_id, show_id)
         ]
 
-    def lookup(self, uri):
+    @override
+    def lookup(self, uri):  # noqa: PLR0911
         try:
             library_uri = ORFLibraryUri.parse(uri)
-        except InvalidORFUri as e:
-            logger.error(e)
+        except InvalidORFUriError as e:
+            logger.error(e)  # noqa: TRY400
             return []
 
-        if library_uri.uri_type == ORFUriType.LIVE:
-            return [Track(uri=str(library_uri), name="Live")]
-
-        if library_uri.uri_type == ORFUriType.STATION:
-            return self._browse_station(library_uri.station)
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE_DAY:
-            return self._browse_day(library_uri.station, library_uri.day_id)
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE_SHOW:
-            return self._browse_show(
-                library_uri.station, library_uri.day_id, library_uri.show_id
-            )
-
-        if library_uri.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return self._lookup_item(
-                library_uri.station,
-                library_uri.day_id,
-                library_uri.show_id,
-                library_uri.item_id,
-            )
-
-        logger.warning(
-            "ORFLibraryProvider.lookup called with uri "
-            "that does not support lookup: '%s'." % uri
-        )
-        return []
+        match library_uri.uri_type:
+            case ORFUriType.ROOT:
+                logger.warning(
+                    "ORFLibraryProvider.lookup called with URI "
+                    f"that does not support lookup: {uri!r}"
+                )
+                return []
+            case ORFUriType.LIVE:
+                return [Track(uri=str(library_uri), name="Live")]
+            case ORFUriType.STATION:
+                return self._browse_station(library_uri.station)
+            case ORFUriType.ARCHIVE_DAY:
+                return self._browse_day(library_uri.station, library_uri.day_id)
+            case ORFUriType.ARCHIVE_SHOW:
+                return self._browse_show(
+                    library_uri.station, library_uri.day_id, library_uri.show_id
+                )
+            case ORFUriType.ARCHIVE_ITEM:
+                return self._lookup_item(
+                    library_uri.station,
+                    library_uri.day_id,
+                    library_uri.show_id,
+                    library_uri.item_id,
+                )
 
     def _lookup_item(self, station, day_id, show_id, item_id):
         item = self.client.get_item(station, day_id, show_id, item_id)
@@ -193,6 +196,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
             )
         ]
 
+    @override
     def refresh(self, uri=None):
         self.client.refresh()
 
@@ -200,7 +204,7 @@ class ORFLibraryProvider(backend.LibraryProvider):
 class ORFLibraryUri:
     def __init__(
         self,
-        uri_type,
+        uri_type: ORFUriType,
         station_slug=None,
         day_id=None,
         show_id=None,
@@ -214,56 +218,55 @@ class ORFLibraryUri:
 
     @staticmethod
     def parse(uri):
-        scheme, _, path, _, _ = urllib.parse.urlsplit(uri)
+        _scheme, _, path, _, _ = urllib.parse.urlsplit(uri)
         station, live_or_day, show, item, *_ = path.split("/", 4) + 4 * [None]
 
         if station == "":
             return ORFLibraryUri(ORFUriType.ROOT)
         if live_or_day is None:
             return ORFLibraryUri(ORFUriType.STATION, station)
-        elif live_or_day == "live":
+        if live_or_day == "live":
             return ORFLibraryUri(ORFUriType.LIVE, station)
-        else:
-            if item:
-                return ORFLibraryUri(
-                    ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item
-                )
-            if show:
-                return ORFLibraryUri(
-                    ORFUriType.ARCHIVE_SHOW, station, live_or_day, show
-                )
-            return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
+        if item:
+            return ORFLibraryUri(
+                ORFUriType.ARCHIVE_ITEM, station, live_or_day, show, item
+            )
+        if show:
+            return ORFLibraryUri(ORFUriType.ARCHIVE_SHOW, station, live_or_day, show)
+        return ORFLibraryUri(ORFUriType.ARCHIVE_DAY, station, live_or_day)
 
-        raise InvalidORFUri(uri)
+        raise InvalidORFUriError(uri)
 
     @property
     def loopstream(self):
-        name, loopstream_slug = ORFUris.stations[self.station]
+        _name, loopstream_slug = ORFUris.stations[self.station]
         return loopstream_slug
 
-    def __str__(self):
-        if self.uri_type == ORFUriType.ROOT:
-            return f"{ORFUris.ROOT}:"
-        if self.uri_type == ORFUriType.STATION:
-            return f"{ORFUris.ROOT}:{self.station}"
-        if self.uri_type == ORFUriType.LIVE:
-            return f"{ORFUris.ROOT}:{self.station}/live"
-        if self.uri_type == ORFUriType.ARCHIVE_DAY:
-            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}"
-        if self.uri_type == ORFUriType.ARCHIVE_SHOW:
-            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}"
-        if self.uri_type == ORFUriType.ARCHIVE_ITEM:
-            return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}/{self.item_id}"  # noqa: B950
+    def __str__(self) -> str:
+        match self.uri_type:
+            case ORFUriType.ROOT:
+                return f"{ORFUris.ROOT}:"
+            case ORFUriType.STATION:
+                return f"{ORFUris.ROOT}:{self.station}"
+            case ORFUriType.LIVE:
+                return f"{ORFUris.ROOT}:{self.station}/live"
+            case ORFUriType.ARCHIVE_DAY:
+                return f"{ORFUris.ROOT}:{self.station}/{self.day_id}"
+            case ORFUriType.ARCHIVE_SHOW:
+                return f"{ORFUris.ROOT}:{self.station}/{self.day_id}/{self.show_id}"
+            case ORFUriType.ARCHIVE_ITEM:
+                return (
+                    f"{ORFUris.ROOT}:{self.station}/{self.day_id}"
+                    f"/{self.show_id}/{self.item_id}"
+                )
 
 
-class InvalidORFUri(TypeError):
+class InvalidORFUriError(TypeError):
     def __init__(self, uri):
-        super(TypeError, self).__init__(
-            "The URI is not a valid ORFLibraryUri: '%s'." % uri
-        )
+        super().__init__(f"The URI is not a valid ORFLibraryUri: {uri!r}")
 
 
-class ORFUriType:
+class ORFUriType(IntEnum):
     ROOT = 0
     STATION = 1
     LIVE = 2

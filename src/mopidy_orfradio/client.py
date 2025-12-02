@@ -1,33 +1,37 @@
+import datetime as dt
+import json
 import logging
+import re
 import urllib
+from typing import ClassVar
 
+import dateutil.parser
 from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
 
-import dateutil.parser
-import datetime
-
-import json
-import re
+from mopidy_orfradio import TZ
 
 logger = logging.getLogger(__name__)
 
 
 class HttpClient:
-    cache_opts = {"cache.type": "memory"}
+    cache_opts: ClassVar[dict[str, str]] = {"cache.type": "memory"}
 
     cache = CacheManager(**parse_cache_config_options(cache_opts))
 
     @cache.cache("get", expire=300)
     def get(self, url):
+        logger.debug(f"Fetching data from {url!r}")
+        if not url.startswith("http"):
+            msg = f"Invalid URL: {url!r}"
+            raise ValueError(msg)
         try:
-            logger.debug("Fetching data from %r", url)
-            response = urllib.request.urlopen(url)
+            response = urllib.request.urlopen(url)  # noqa: S310
             content = response.read()
             encoding = response.headers["content-type"].split("charset")[-1]
             return content.decode(encoding)
-        except Exception as e:
-            logger.error("Error fetching data from '%s': %s", url, e)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(f"Error fetching data from {url!r}: {exc}")  # noqa: TRY400
 
     def refresh(self):
         self.cache.invalidate(self.get, "get")
@@ -36,10 +40,10 @@ class HttpClient:
 class ORFClient:
     archive_uri = "https://audioapi.orf.at/%s/json/2.0/broadcasts/"
     record_uri = "https://audioapi.orf.at/%s/api/json/4.0/broadcast/%s/%s"
-    show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"  # noqa: B950
+    show_uri = "https://loopstream01.apa.at/?channel=%s&shoutcast=0&id=%s&offset=%s&offsetende=%s"
     live_uri = "https://orf-live.ors-shoutcast.at/%s-%s"
 
-    bitrates = {
+    bitrates: ClassVar[dict[int, str]] = {
         128: "q1a",
         192: "q2a",
     }
@@ -60,18 +64,14 @@ class ORFClient:
             return []
 
         def now(offset):
-            return datetime.datetime.now(
-                datetime.timezone(datetime.timedelta(milliseconds=offset))
-            )
+            return dt.datetime.now(dt.timezone(dt.timedelta(milliseconds=offset)))
 
-        shows = [
-            _to_show(i, broadcast_rec)
-            for i, broadcast_rec in enumerate(day_rec["broadcasts"])
+        return [
+            _to_show(broadcast_rec)
+            for broadcast_rec in day_rec["broadcasts"]
             if dateutil.parser.parse(broadcast_rec["startISO"])
             < now(broadcast_rec["endOffset"])
         ]
-
-        return shows
 
     def get_show(self, station, day_id, show_id):
         show_rec = self._get_record_json(station, show_id, day_id)
@@ -133,9 +133,7 @@ class ORFClient:
     def get_item(self, station, day_id, show_id, item_id):
         show = self.get_show(station, day_id, show_id)
         return next(
-            item
-            for item in show
-            if item["id"].split("-")[0] == item_id.split("-")[0]
+            item for item in show if item["id"].split("-")[0] == item_id.split("-")[0]
         )
 
     def get_item_url(self, station, loopstream_slug, day_id, show_id, item_id):
@@ -149,16 +147,14 @@ class ORFClient:
 
         item_start, item_end, *_ = item_id.split("-", 1) + 1 * [None]
         stream = next(
-            stream
-            for stream in reversed(streams)
-            if stream["start"] <= int(item_start)
+            stream for stream in reversed(streams) if stream["start"] <= int(item_start)
         )
-        streamId = stream["loopStreamId"]
+        stream_id = stream["loopStreamId"]
         offsetstart = int(item_start) - stream["start"]
         offsetende = int(item_end) - stream["start"] if item_end else ""
         return ORFClient.show_uri % (
             loopstream_slug,
-            streamId,
+            stream_id,
             offsetstart,
             offsetende,
         )
@@ -170,10 +166,8 @@ class ORFClient:
         try:
             content = self.http_client.get(uri)
             return json.loads(content)
-        except Exception as e:
-            logger.error(
-                "Error decoding content received from '%s': %s", uri, e
-            )
+        except Exception as exc:  # noqa: BLE001
+            logger.error(f"Error decoding content received from {uri!r}: {exc}")  # noqa: TRY400
 
     def _get_archive_json(self, station):
         return self._get_json(ORFClient.archive_uri % station)
@@ -182,8 +176,8 @@ class ORFClient:
         json = self._get_archive_json(station)
         return next((rec for rec in json if _get_day_id(rec) == day_id), None)
 
-    def _get_record_json(self, station, programKey, day):
-        return self._get_json(ORFClient.record_uri % (station, programKey, day))
+    def _get_record_json(self, station, program_key, day):
+        return self._get_json(ORFClient.record_uri % (station, program_key, day))
 
 
 def _get_day_id(day_rec):
@@ -192,11 +186,11 @@ def _get_day_id(day_rec):
 
 def _get_day_label(day_id):
     # The day id is a string in the form "YYYYMMDD".
-    date = datetime.datetime.strptime(day_id, "%Y%m%d")
+    date = dt.datetime.strptime(day_id, "%Y%m%d").replace(tzinfo=TZ)
     return date.strftime("%a %Y-%m-%d")
 
 
-def _to_show(i, rec):
+def _to_show(rec):
     time = dateutil.parser.parse(rec["scheduledISO"])
 
     # Note: items with times < 06:00 are from the next day and should be last
@@ -225,8 +219,7 @@ def _generate_id(show_rec, i):
     if i + 1 < len(show_rec["items"]):
         end = show_rec["items"][i + 1]["start"]
         return f"{start}-{end}"
-    else:
-        return f"{start}"
+    return f"{start}"
 
 
 def _calculate_length(show_rec, i):
