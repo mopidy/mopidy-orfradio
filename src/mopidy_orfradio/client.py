@@ -60,8 +60,8 @@ class ORFClient:
     ) -> None:
         self.http_client = http_client or HttpClient()
         if backend:
-            self.media_types = backend.config["orfradio"]["archive_types"]  # type: ignore -- Fixed in mopidy >= 4.0.0a14
-            selected_bitrate = backend.config["orfradio"]["livestream_bitrate"]  # type: ignore -- Fixed in mopidy >= 4.0.0a14
+            self.media_types = backend.config["orfradio"]["archive_types"]
+            selected_bitrate = backend.config["orfradio"]["livestream_bitrate"]
             self.live_bitrate = self.bitrates[selected_bitrate]
         else:
             self.media_types = ["M", "B", "N"]
