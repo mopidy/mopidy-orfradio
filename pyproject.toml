@@ -14,10 +14,10 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "beaker",
+    "beaker >= 1.13",
     "mopidy >= 4.0.0",
     "pykka >= 4.1",
-    "python-dateutil",
+    "python-dateutil >= 2.9",
 ]
 
 [project.urls]
