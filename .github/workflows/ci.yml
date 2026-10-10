@@ -54,7 +54,7 @@ jobs:
             python: "3.15"
             tox: "ruff-format"
           - name: "ty"
-            python: "3.14"
+            python: "3.15"
             tox: "ty"
 
     name: ${{ matrix.name }}
